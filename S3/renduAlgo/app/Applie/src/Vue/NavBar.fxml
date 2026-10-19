@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox fx:id="buttonContainer" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="controleurs.NavBarController"
+      spacing="30" alignment="CENTER" 
+      prefWidth="800"
+      style="-fx-background-color: #ffffff; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+    
+    </HBox>

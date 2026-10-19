@@ -1,0 +1,70 @@
+package controleurs;
+
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import java.io.IOException;
+
+public class MainController {
+
+    // Éléments de l'interface principale 
+    @FXML private BorderPane mainContainer;
+    @FXML private Label userRoleLabel;
+    @FXML private Button logoutButton;
+    private String Role; // Stocke le rôle de l'utilisateur actuel
+
+    // Affiche ou cache le bouton de déconnexion et le texte du rôle
+    public void setLogoutButtonVisible(boolean visible) {
+        if (logoutButton != null) {
+            logoutButton.setVisible(visible);
+            userRoleLabel.setVisible(visible);
+            
+            // Empêche les éléments invisibles de prendre de la place dans la mise en page
+            logoutButton.setManaged(visible); 
+            userRoleLabel.setManaged(visible); 
+        }
+    }
+
+    // Définit et affiche le rôle de l'utilisateur (ex: Étudiant, Administrateur)
+    public void setRole(String role) {
+        this.Role = role;
+        if (userRoleLabel != null) {
+            userRoleLabel.setText("Connecté en tant que : " + role);
+        }
+    }
+
+    // Change dynamiquement le contenu affiché au centre de la fenêtre
+    public void chargerPage(String fxmlFile) {
+        try {
+            // Charge le fichier FXML correspondant à la nouvelle page
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Vue/" + fxmlFile));
+            Parent view = loader.load();
+            
+            // Place la nouvelle vue au centre du BorderPane principal
+            mainContainer.setCenter(view); 
+        } catch (IOException e) {
+            // Affiche une erreur dans la console si le fichier est introuvable
+            System.err.println("Erreur de chargement de la page : " + fxmlFile);
+            e.printStackTrace();
+        }
+    }
+
+    // Retourne le rôle actuel de l'utilisateur connecté
+    public String getCurrentRole() {
+        return Role;
+    }
+    
+    // Gère l'action du clic sur le bouton "Déconnexion"
+    @FXML
+    private void handleLogout() {
+        // Renvoie l'utilisateur vers la page de connexion
+        chargerPage("Login.fxml");
+        
+        // Cache les éléments de session (bouton logout et rôle)
+        setLogoutButtonVisible(false);
+        System.out.println("Utilisateur déconnecté.");
+    }
+}

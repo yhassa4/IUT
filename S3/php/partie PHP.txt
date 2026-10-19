@@ -1,0 +1,28 @@
+Modele 
+- Eudiant.php getAllEtudiant() countEtudiant() getEtudiantByName(String name) countRedoublant() countApprentie()
+- Sondage.php getSondageEncours() getSondageTermine() countSondage() getStatus() -> enCours/Terminé
+- Enseignant.php getAllEnseignant() countEnseignant()
+- Promotion.php countPromotion()
+- Groupe.php getAllGroupe()
+
+Vue 
+- vueEnsemble
+- sondage
+- groupe
+- etudiant
+- enseignant
+- erreur
+
+
+
+
+
+
+Controleur
+- Requete création d'un groupe
+- Requete création sondage
+- Requete ajouter un étudiant dans un groupe -> ajoutEtudiant(int groupeID)
+
+
+
+CSS

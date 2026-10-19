@@ -1,0 +1,265 @@
+package controleurs;
+
+import Base.*;
+import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+public class GestionEnseignantController {
+
+    // Éléments de l'interface graphique (Tableau et colonnes)
+    @FXML private TableView<Enseignant> tableEnseignants;
+    @FXML private TableColumn<Enseignant, String> colNom, colPrenom, colGenre, colMatiere, colRole;
+    @FXML private NavBarController navBarController;
+
+    @FXML
+    public void initialize() {
+        // Relie les colonnes aux données de l'objet Enseignant
+        colNom.setCellValueFactory(new PropertyValueFactory<>("nom")); 
+        colPrenom.setCellValueFactory(new PropertyValueFactory<>("prenom"));
+        colGenre.setCellValueFactory(new PropertyValueFactory<>("genreEnsei"));
+        colRole.setCellValueFactory(new PropertyValueFactory<>("role"));
+        
+        // Configuration pour afficher la liste des matières sous forme de texte séparé par des virgules
+        colMatiere.setCellFactory(column -> new TableCell<Enseignant, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setText(null);
+                } else {
+                    Enseignant ens = getTableRow().getItem();
+                    setText(String.join(", ", ens.getToutesLesMatieres()));
+                }
+            }
+        });
+
+        // Charge la liste des enseignants dans le tableau
+        tableEnseignants.setItems(FXCollections.observableArrayList(Enseignant.ListEnseignant));
+        if(navBarController != null) navBarController.updateNav(5); 
+    }
+
+    @FXML
+    private void handleAjouterEnseignant() {
+        // Création de la fenêtre surgissante
+        Dialog<Enseignant> dialog = new Dialog<>();
+        dialog.setTitle("Ajouter un nouvel enseignant");
+        dialog.setHeaderText("Veuillez saisir les informations de l'enseignant");
+
+        // Boutons de validation
+        ButtonType loginButtonType = new ButtonType("Ajouter", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+        // Organisation du formulaire de saisie
+        GridPane grid = new GridPane();
+        grid.setHgap(10); grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField nom = new TextField(); nom.setPromptText("Nom");
+        TextField prenom = new TextField(); prenom.setPromptText("Prénom");
+        ComboBox<String> genre = new ComboBox<>(FXCollections.observableArrayList("M", "F", "Autre"));
+        genre.setValue("M");
+        TextField adresse = new TextField(); adresse.setPromptText("Adresse");
+        TextField mailPerso = new TextField(); mailPerso.setPromptText("Email Personnel");
+        TextField mailPro = new TextField(); mailPro.setPromptText("Email Professionnel");
+        ComboBox<String> role = new ComboBox<>(FXCollections.observableArrayList(
+            "ENSEIGNANT", "RESPONSABLE D’ANNÉE", "RESPONSABLE SEMESTRE", 
+            "RESPONSABLE DE FORMATION", "RESPONSABLE DE FILIÈRE"
+        ));
+        role.setValue("ENSEIGNANT");
+
+        // Ajout des étiquettes et champs dans la grille
+        grid.add(new Label("Nom :"), 0, 0); grid.add(nom, 1, 0);
+        grid.add(new Label("Prénom :"), 0, 1); grid.add(prenom, 1, 1);
+        grid.add(new Label("Genre :"), 0, 2); grid.add(genre, 1, 2);
+        grid.add(new Label("Adresse :"), 0, 3); grid.add(adresse, 1, 3);
+        grid.add(new Label("Mail Perso :"), 0, 4); grid.add(mailPerso, 1, 4);
+        grid.add(new Label("Mail Pro :"), 0, 5); grid.add(mailPro, 1, 5);
+        grid.add(new Label("Rôle :"), 0, 6); grid.add(role, 1, 6);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // Transforme les saisies en un nouvel objet Enseignant
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == loginButtonType) {
+                return new Enseignant(
+                    Enseignant.ListEnseignant.size() + 1,
+                    nom.getText(), prenom.getText(), genre.getValue(),
+                    mailPro.getText(), mailPerso.getText(), adresse.getText(), role.getValue()
+                );
+            }
+            return null;
+        });
+
+        // Affiche la fenêtre et rafraîchit le tableau si validé
+        Optional<Enseignant> result = dialog.showAndWait();
+        result.ifPresent(enseignant -> {
+            tableEnseignants.setItems(FXCollections.observableArrayList(Enseignant.ListEnseignant));
+            tableEnseignants.refresh();
+        });
+    }
+
+    @FXML
+    private void handleModifierRole() {
+        // Récupère l'enseignant sélectionné
+        Enseignant selectionne = tableEnseignants.getSelectionModel().getSelectedItem();
+        if (selectionne == null) {
+            afficherAlerte("Aucune sélection", "Veuillez sélectionner un enseignant à modifier.");
+            return;
+        }
+
+        // Liste des choix possibles pour le nouveau rôle
+        List<String> choix = Arrays.asList("ENSEIGNANT", "RESPONSABLE D’ANNÉE", "RESPONSABLE SEMESTRE", "RESPONSABLE DE FORMATION", "RESPONSABLE DE FILIÈRE");
+
+        // Ouvre une fenêtre de choix
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(selectionne.getRole(), choix);
+        dialog.setTitle("Modifier le rôle");
+        dialog.setHeaderText("Modification pour " + selectionne.getNomComplet());
+
+        // Met à jour le rôle et rafraîchit l'affichage
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(nouveauRole -> {
+            selectionne.setrole(nouveauRole);
+            tableEnseignants.refresh();
+        });
+    }
+
+    @FXML
+    private void handleSupprimerEnseignant() {
+        Enseignant selectionne = tableEnseignants.getSelectionModel().getSelectedItem();
+        if (selectionne == null) {
+            afficherAlerte("Aucune sélection", "Veuillez sélectionner un enseignant à supprimer.");
+            return;
+        }
+
+        // Demande de confirmation avant suppression
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation de suppression");
+        alert.setHeaderText("Supprimer " + selectionne.getNomComplet() + " ?");
+
+        if (alert.showAndWait().get() == ButtonType.OK) {
+            Enseignant.ListEnseignant.remove(selectionne);
+            tableEnseignants.getItems().remove(selectionne);
+        }
+    }
+
+    // Affiche un message d'avertissement simple
+    private void afficherAlerte(String titre, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(titre);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+    
+    @FXML
+    private void handleAjouterCours() {
+        Enseignant selectionne = tableEnseignants.getSelectionModel().getSelectedItem();
+        if (selectionne == null) {
+            afficherAlerte("Aucune sélection", "Veuillez sélectionner un enseignant.");
+            return;
+        }
+
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Affecter un cours");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10); grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        // Menus déroulants pour Promo, Groupe et Matière
+        ComboBox<Promotion> comboPromo = new ComboBox<>(FXCollections.observableArrayList(Promotion.ListPromo));
+        ComboBox<IGroup> comboGroup = new ComboBox<>();
+        ComboBox<Matiere> comboMatiere = new ComboBox<>(FXCollections.observableArrayList(selectionne.getMatiereEnsei()));
+        
+        // Personnalisation de l'affichage du nom de la matière
+        comboMatiere.setCellFactory(lv -> new ListCell<Matiere>() {
+            @Override protected void updateItem(Matiere item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : item.getNomMatiere());
+            }
+        });
+        comboMatiere.setButtonCell(comboMatiere.getCellFactory().call(null));
+
+        // Met à jour les groupes quand on choisit une promotion
+        comboPromo.setOnAction(e -> {
+            Promotion p = comboPromo.getValue();
+            if (p != null) {
+                ObservableList<IGroup> groupesDeLaPromo = FXCollections.observableArrayList();
+                for (Group g : Group.ListGroup2) {
+                    if (g.getPromo().equals(p)) {
+                        if (g.issetGroupTD() && !groupesDeLaPromo.contains(g.getGroupTD())) groupesDeLaPromo.add(g.getGroupTD());
+                        if (g.issetGroupTP() && !groupesDeLaPromo.contains(g.getGroupTP())) groupesDeLaPromo.add(g.getGroupTP());
+                    }
+                }
+                comboGroup.setItems(groupesDeLaPromo);
+            }
+        });
+
+        grid.add(new Label("Promotion :"), 0, 0); grid.add(comboPromo, 1, 0);
+        grid.add(new Label("Groupe :"), 0, 1); grid.add(comboGroup, 1, 1);
+        grid.add(new Label("Matière :"), 0, 2); grid.add(comboMatiere, 1, 2);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // Finalise l'affectation du cours
+        dialog.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                IGroup groupSelected = comboGroup.getValue();
+                Matiere matiereSelected = comboMatiere.getValue();
+
+                if (groupSelected != null && matiereSelected != null) {
+                    GroupTD td = (groupSelected instanceof GroupTD) ? (GroupTD) groupSelected : null;
+                    GroupTP tp = (groupSelected instanceof GroupTP) ? (GroupTP) groupSelected : null;
+                    
+                    selectionne.ajouterCours(matiereSelected, td, tp);
+                    new Alert(Alert.AlertType.INFORMATION, "Le cours a été affecté avec succès.").show();
+                } else {
+                    afficherAlerte("Champs incomplets", "Veuillez remplir tous les champs.");
+                }
+            }
+        });
+    }
+
+    @FXML
+    private void handleVoirCours() {
+        Enseignant selectionne = tableEnseignants.getSelectionModel().getSelectedItem();
+        if (selectionne == null) {
+            afficherAlerte("Aucune sélection", "Veuillez sélectionner un enseignant.");
+            return;
+        }
+
+        // Fenêtre affichant la liste des cours assignés à l'enseignant
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Liste des cours");
+        dialog.setHeaderText("Cours de " + selectionne.getNomComplet());
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+
+        ListView<String> listView = new ListView<>();
+        ObservableList<String> items = FXCollections.observableArrayList();
+
+        // Parcourt les affectations et les formate pour l'affichage
+        if (selectionne.mesCours.isEmpty()) {
+            items.add("Aucun cours affecté.");
+        } else {
+            for (AffectationEnseignant aff : selectionne.mesCours) {
+                String matiere = aff.getMatiere().getNomMatiere();
+                String groupe = (aff.getGroupeTD() != null) ? aff.getGroupeTD().toString() : aff.getGroupeTP().toString();
+                items.add("Matière : " + matiere + " | Groupe : " + groupe);
+            }
+        }
+        
+        listView.setItems(items);
+        dialog.getDialogPane().setContent(new VBox(listView));
+        dialog.showAndWait();
+    }
+}

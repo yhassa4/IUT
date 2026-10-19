@@ -1,0 +1,25 @@
+/* style.css */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: #fcfcfc;
+    -fx-border-color: transparent;
+}
+
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-width: 8px;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #cccccc;
+    -fx-background-radius: 10px;
+}
+
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #a50044;
+}
+
+.scroll-bar:vertical .increment-button, .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}

@@ -1,0 +1,19 @@
+<main>
+    <form action="routeur.php" method="get">
+        <input type="hidden" name="controleur" value="controleurVoiture">
+        <input type="hidden" name="action" value="creerVoiture">
+        <div>
+            <label for="immatriculation">immatriculation</label>
+            <input type="text" name="immatriculation" placeholder="immatriculation" required>
+        </div>
+        <div>
+            <label for="marque">marque</label>
+            <input type="text" name="marque" placeholder="marque" required>
+        </div>
+        <div>
+            <label for="couleur">couleur</label>
+            <input type="text" name="couleur" placeholder="couleur" required>
+        </div>
+        <button type="submit">créer</button>
+    </form>
+</main>

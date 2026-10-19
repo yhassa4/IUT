@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://bruv720q1u1ym"]
+
+[ext_resource type="Texture2D" uid="uid://c56vy046vwdon" path="res://assets/sprites/circle_saw.png" id="1_k45r4"]
+[ext_resource type="Script" uid="uid://djvyxmue1e7wq" path="res://scripts/saw.gd" id="2_kprxg"]
+[ext_resource type="Texture2D" uid="uid://cjj5gy8nbcbxq" path="res://assets/environment/pointLight.png" id="3_846d5"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_kprxg"]
+radius = 30.016663
+
+[node name="Area2D" type="Area2D" unique_id=1848190067]
+collision_layer = 2
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=88529677]
+scale = Vector2(3, 3)
+texture = ExtResource("1_k45r4")
+script = ExtResource("2_kprxg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1254508943]
+shape = SubResource("CircleShape2D_kprxg")
+
+[node name="PointLight2D" type="PointLight2D" parent="." unique_id=568959609]
+scale = Vector2(0.5, 0.5)
+color = Color(0.3327386, 0.120315425, 0.090487026, 1)
+energy = 2.0
+texture = ExtResource("3_846d5")
+
+[connection signal="body_entered" from="." to="Sprite2D" method="_on_area_2d_body_entered"]

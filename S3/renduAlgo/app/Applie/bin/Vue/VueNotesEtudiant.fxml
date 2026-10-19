@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="controleurs.NotesEtudiantController" style="-fx-background-color: #fcfcfc;">
+    
+    <fx:include fx:id="navBar" source="NavBar.fxml" />
+
+    <VBox spacing="15" style="-fx-padding: 30;">
+        <Label text="Mes Notes" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0c0d16;" />
+
+        <HBox spacing="15" alignment="CENTER_LEFT">
+            <Label text="Semestre :" style="-fx-font-weight: bold;" />
+            <ComboBox fx:id="semestreCombo" prefWidth="150" promptText="Tous" />
+        </HBox>
+
+        <TableView fx:id="tableNotes" VBox.vgrow="ALWAYS" style="-fx-background-radius: 8; -fx-border-color: #dddddd; -fx-border-radius: 8;">
+            <columns>
+                <TableColumn fx:id="colSemestre" text="Semestre" prefWidth="100" />
+                <TableColumn fx:id="colMatiere" text="Matière" prefWidth="250" />
+                <TableColumn fx:id="colNote" text="Note" prefWidth="100" />
+                <TableColumn fx:id="colNoteMax" text="Note MAX" prefWidth="100" />
+            </columns>
+            <placeholder>
+                <Label text="Aucune note à afficher pour ce semestre." />
+            </placeholder>
+        </TableView>
+
+        <HBox alignment="CENTER_RIGHT" style="-fx-background-color: #a50044; -fx-padding: 15; -fx-background-radius: 8;">
+            <Label text="MOYENNE DU SEMESTRE : " textFill="WHITE" style="-fx-font-weight: bold;" />
+            <Label fx:id="lblMoyenne" text="-- / 20" textFill="WHITE" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+        </HBox>
+    </VBox>
+</VBox>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="15" xmlns:fx="http://javafx.com/fxml" fx:controller="controleurs.SondageController">
+
+     <fx:include fx:id="navBar" source="NavBar.fxml" />
+    <Label text="Administration des Sondages" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+
+    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <Tab text="Créer un Sondage">
+            <HBox spacing="20">
+                <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                
+                <GridPane hgap="10" vgap="15">
+                    <Label text="Nom du Sondage :"/>
+                    <TextField fx:id="txtNomSondage" GridPane.columnIndex="1" prefWidth="200"/>
+
+                    <Label text="Promotion cible :" GridPane.rowIndex="1"/>
+                    <ComboBox fx:id="comboPromo" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="200"/>
+
+                    <Label text="Date Début :" GridPane.rowIndex="2"/>
+                    <DatePicker fx:id="dateDebut" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                    <Label text="Date Fin :" GridPane.rowIndex="3"/>
+                    <DatePicker fx:id="dateFin" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                    
+                    <Button text="Valider et Créer le Sondage" onAction="#creerSondage" 
+                            GridPane.rowIndex="4" GridPane.columnIndex="1" style="-fx-base: #2ecc71; -fx-font-weight: bold;"/>
+                </GridPane>
+
+                <VBox spacing="10" HBox.hgrow="ALWAYS">
+                    <Label text="Questions du sondage :" style="-fx-font-weight: bold;"/>
+                    <ListView fx:id="listQuestionsTemporaires" prefHeight="150"/>
+                    <Button text="+ Ajouter une Question" onAction="#ajouterQuestionALaListe" maxWidth="Infinity"/>
+                </VBox>
+            </HBox>
+        </Tab>
+
+        <Tab text="Résultats et Exports">
+            <VBox spacing="10">
+                <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+                <TableView fx:id="tableSondages" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colNom" text="Sondage" prefWidth="200"/>
+                        <TableColumn fx:id="colPromo" text="Promotion" prefWidth="150"/>
+                        <TableColumn fx:id="colStatus" text="Statut" prefWidth="100"/>
+                    </columns>
+                </TableView>
+                <HBox spacing="15" alignment="CENTER_RIGHT">
+                    <Button text="Voir Réponses Individuelles" onAction="#ouvrirDetailReponses"/>
+                    <Button text="Exporter en CSV" onAction="#exporterCSV" style="-fx-base: #3498db;"/>
+                </HBox>
+            </VBox>
+        </Tab>
+    </TabPane>
+</VBox>

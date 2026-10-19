@@ -1,0 +1,38 @@
+package controleurs;
+
+import javafx.scene.control.ListCell;
+
+// On crée une classe qui hérite de ListCell
+public class QuestionCell extends ListCell<String> {
+
+    @Override
+    protected void updateItem(String item, boolean empty) {
+        // Obligatoire : appeler le comportement par défaut
+        super.updateItem(item, empty);
+
+        // Si la case est vide, on n'affiche rien
+        if (empty || item == null) {
+            setText(null);
+            setGraphic(null);
+        } else {
+            // 1. On sépare l'intitulé et les choix
+            // Le \\| est nécessaire car | est un symbole spécial
+            String[] parts = item.split("\\|");
+            
+            String intitule = parts[0];
+            String texteFinal;
+
+            // 2. On regarde si on a des choix (QCM) ou pas (Libre)
+            if (parts.length > 1) {
+                // On compte les choix en séparant par le point-virgule
+                int nbChoix = parts[1].split(";").length;
+                texteFinal = intitule + " [QCM - " + nbChoix + " choix]";
+            } else {
+                texteFinal = intitule + " [Réponse Libre]";
+            }
+
+            // 3. On affiche le texte final dans la cellule
+            setText(texteFinal);
+        }
+    }
+}

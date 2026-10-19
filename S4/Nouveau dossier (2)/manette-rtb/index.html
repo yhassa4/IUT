@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        body { 
+            background: #111; 
+            color: white; 
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #status { 
+            position: absolute;
+            top: 0; width: 100%;
+            padding: 10px; 
+            background: rgba(34, 34, 34, 0.9); 
+            text-align: center;
+            z-index: 10;
+            font-size: 14px;
+            border-bottom: 1px solid #444;
+        }
+
+        /* Grille principale : 2 colonnes (moitié gauche / moitié droite) */
+        .controls-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr; 
+            height: 100vh;
+            width: 100vw;
+            box-sizing: border-box;
+        }
+
+        /* Zone Gauche : Contient les flèches alignées en bas */
+        .left-side {
+            display: flex;
+            align-items: flex-end; /* Pousse vers le bas */
+            padding: 15px;
+        }
+
+        .movement-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Aligne gauche/droite sur une ligne */
+            gap: 10px;
+            width: 100%;
+        }
+
+        /* Zone Droite : Contient le bouton Saut en bas */
+        .right-side {
+            display: flex;
+            align-items: flex-end; /* Pousse vers le bas */
+            padding: 15px;
+        }
+
+        button { 
+            width: 100%;
+            font-weight: bold;
+            color: white; 
+            border-radius: 15px; 
+            outline: none;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            border: 2px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Boutons de déplacement (Côte à côte) */
+        .btn-move { 
+            height: 100px; 
+            background: #333; 
+            font-size: 26px;
+        }
+
+        /* Bouton Saut (Largeur totale de la moitié droite) */
+        .btn-jump { 
+            height: 100px; 
+            background: #007bff; 
+            font-size: 20px;
+            text-transform: uppercase;
+        }
+
+        /* Feedback au toucher */
+        button:active { 
+            background: #555;
+            transform: scale(0.95);
+        }
+
+        .btn-jump:active {
+            background: #00c3ff;
+            border-color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="status">Statut: Connecté</div>
+
+    <div class="controls-wrapper">
+        
+        <div class="left-side">
+            <div class="movement-row">
+                <button class="btn-move" onpointerdown="send('GAUCHE')" onpointerup="send('STOP')">◀</button>
+                <button class="btn-move" onpointerdown="send('DROITE')" onpointerup="send('STOP')">▶</button>
+            </div>
+        </div>
+
+        <div class="right-side">
+            <button class="btn-jump" onpointerdown="send('SAUTER')" onpointerup="send('RELACHE_SAUT')">Sauter</button>
+        </div>
+
+    </div>
+
+    <script>
+        const socket = new WebSocket('wss://lizzie-guardable-chanelle.ngrok-free.dev');
+        
+        socket.onopen = () => document.getElementById('status').innerText = "CONNECTÉ ✅";
+        socket.onclose = () => document.getElementById('status').innerText = "DÉCONNECTÉ ❌";
+        
+        function send(msg) {
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(msg);
+                // Optionnel : petit feedback haptique (vibration) si supporté
+                if (navigator.vibrate) navigator.vibrate(10);
+            }
+        }
+
+        // Empêche le menu contextuel (clic droit) sur les boutons pour mobile
+        window.oncontextmenu = function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        };
+    </script>
+</body>
+</html>

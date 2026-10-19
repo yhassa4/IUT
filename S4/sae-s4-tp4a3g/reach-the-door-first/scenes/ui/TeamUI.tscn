@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://k86fxc3hc47a"]
+
+[ext_resource type="Script" uid="uid://1a33kcpgtb77" path="res://scripts/GameUI.gd" id="1_lu02o"]
+
+[node name="GameUI" type="CanvasLayer" unique_id=439744499]
+layer = 999
+script = ExtResource("1_lu02o")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1624552877]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 69.0
+offset_bottom = 23.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="RedTeam" type="VBoxContainer" parent="HBoxContainer" unique_id=198535295]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/RedTeam" unique_id=1275395988]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.616056, 0, 0.0940255, 1)
+text = "Red"
+
+[node name="BlueTeam" type="VBoxContainer" parent="HBoxContainer" unique_id=813265957]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/BlueTeam" unique_id=1223577738]
+layout_mode = 2
+theme_override_colors/font_color = Color(8.66354e-07, 0.544901, 0.842082, 1)
+text = "Blue"
+
+[node name="GreenTeam" type="VBoxContainer" parent="HBoxContainer" unique_id=680287311]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/GreenTeam" unique_id=1400842130]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.14755315, 0.3842603, 0, 1)
+text = "Green"
