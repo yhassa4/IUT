@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="15" xmlns:fx="http://javafx.com/fxml" fx:controller="controleurs.GroupeCreaController">
+<fx:include fx:id="navBar" source="NavBar.fxml" />
+
+
+	<HBox spacing="15" alignment="CENTER_LEFT" style="-fx-background-color: #f8f9fa; -fx-padding: 10; -fx-border-color: #dee2e6; -fx-border-radius: 5;">
+	    <VBox spacing="2">
+	        <Label text="Promotion" style="-fx-font-size: 10; -fx-font-weight: bold;"/>
+	        <ComboBox fx:id="comboPromo" onAction="#chargerStatsPromo" prefWidth="150"/>
+	    </VBox>
+	
+	    <Separator orientation="VERTICAL" />
+	
+	    <VBox spacing="2">
+	        <Label text="Cible de publication" style="-fx-font-size: 10; -fx-font-weight: bold;"/>
+	        <ComboBox fx:id="comboCiblePublication" prefWidth="180" promptText="Choisir les groupes..."/>
+	    </VBox>
+	
+	    <VBox spacing="2" alignment="CENTER_LEFT">
+	        <Label text="Date actuelle :" style="-fx-font-size: 10;"/>
+	        <Label fx:id="lblDateActuellePubli" text="Aucune" style="-fx-font-weight: bold; -fx-text-fill: #2980b9;"/>
+	    </VBox>
+	
+	    <VBox spacing="2">
+	        <Label text="Nouvelle Date" style="-fx-font-size: 10; -fx-font-weight: bold;"/>
+	        <HBox spacing="5">
+	            <DatePicker fx:id="datePublication" prefWidth="130"/>
+	            <Button text="Modifier" onAction="#modifierDatePublication" style="-fx-base: #3498db; -fx-text-fill: white;"/>
+	        </HBox>
+	    </VBox>
+	
+	    <Region HBox.hgrow="ALWAYS" />
+		<Button fx:id="btnExport" text="Exporter Groupes" onAction="#exporterTout" style="-fx-base: #34495e; -fx-text-fill: white;" visible="false"/>
+	    <Button text="PUBLIER DIRECT" onAction="#publierMaintenant" prefHeight="40" style="-fx-base: #2ecc71; -fx-font-weight: bold; -fx-text-fill: white;"/>
+	    <Button text="Supprimer" onAction="#supprimerGroupes" prefHeight="40" style="-fx-base: #e74c3c; -fx-text-fill: white;"/>
+	</HBox>
+
+    <HBox spacing="20">
+        <VBox alignment="CENTER" style="-fx-border-color: #bdc3c7; -fx-padding: 15; -fx-border-radius: 10;" HBox.hgrow="ALWAYS">
+            <Label text="Total Étudiants"/><Label fx:id="lblTotalEtu" text="0" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+        </VBox>
+        <VBox alignment="CENTER" style="-fx-border-color: #bdc3c7; -fx-padding: 15; -fx-border-radius: 10;" HBox.hgrow="ALWAYS">
+            <Label text="Redoublants"/><Label fx:id="lblTotalRedoublants" text="0" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+        </VBox>
+        <VBox alignment="CENTER" style="-fx-border-color: #bdc3c7; -fx-padding: 15; -fx-border-radius: 10;" HBox.hgrow="ALWAYS">
+            <Label text="Apprentis"/><Label fx:id="lblTotalApprentis" text="0" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+        </VBox>
+    </HBox>
+
+    <HBox spacing="15" VBox.vgrow="ALWAYS">
+
+<VBox spacing="10" style="-fx-border-color: #3498db; -fx-padding: 10; -fx-border-radius: 5;" prefWidth="400">
+    <Label text="Personnalisation des Critères" style="-fx-font-weight: bold; -fx-text-fill: #3498db;"/>
+    
+    <ScrollPane fitToWidth="true" prefHeight="300" style="-fx-background-color: transparent;">
+        <GridPane hgap="10" vgap="12">
+            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+            
+            <CheckBox fx:id="chkBac" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <Label text="Diversité des Bacs" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+            <Slider fx:id="sldBac" min="0" max="1.0" value="0.5" disable="${!chkBac.selected}" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+            
+            <CheckBox fx:id="chkGenre" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <Label text="Parité Homme/Femme" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+            <Slider fx:id="sldGenre" min="0" max="1.0" value="0.5" disable="${!chkGenre.selected}" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+            
+            <CheckBox fx:id="chkCovoit" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <Label text="Covoiturage" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            <Slider fx:id="sldCovoit" min="0" max="1.0" value="0.5" disable="${!chkCovoit.selected}" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+            
+            <CheckBox fx:id="chkNotes" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+            <Label text="Équilibre des Notes" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+            <Slider fx:id="sldNotes" min="0" max="1.0" value="0.5" disable="${!chkNotes.selected}" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+
+            <CheckBox fx:id="chkAlternance" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+            <Label text="Mixité Alternants" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+            <Slider fx:id="sldAlternance" min="0" max="1.0" value="0.5" disable="${!chkAlternance.selected}" GridPane.columnIndex="2" GridPane.rowIndex="4"/>
+        </GridPane>
+    </ScrollPane>
+
+    <Separator/>
+    <VBox spacing="10" alignment="CENTER_LEFT">
+    	<HBox spacing="10">
+        	<RadioButton fx:id="rbTD" text="TD" selected="true" onAction="#calculerNbGroupes"><toggleGroup><ToggleGroup fx:id="typeGroup"/></toggleGroup></RadioButton>
+       		<RadioButton fx:id="rbTP" text="TP" toggleGroup="$typeGroup" onAction="#calculerNbGroupes"/>
+        </HBox>
+        <Label text=" Taille : "/>
+        <Spinner fx:id="spinTaille" min="1" max="40" initialValue="20" editable="true" />
+        <Label fx:id="lblInfoGroupes" text="Estimation : 0 groupes" style="-fx-font-style: italic;"/>
+    </VBox>
+
+    <Button text="Lancer Algo" onAction="#genererGloutonManuel" maxWidth="Infinity" style="-fx-base: #34495e; -fx-text-fill: white;"/>
+</VBox>
+
+        <VBox spacing="10" style="-fx-border-color: #34495e; -fx-padding: 10; -fx-border-radius: 5;" prefWidth="250">
+            <Label text="Algorithmes Prédéfinis" style="-fx-font-weight: bold;"/>
+            <Label text="Type :"/>
+            <HBox spacing="10">
+                <RadioButton fx:id="rbTD2" text="TD" selected="true">
+                    <toggleGroup><ToggleGroup fx:id="typeGroup"/></toggleGroup>
+                </RadioButton>
+                <RadioButton fx:id="rbTP2" text="TP" toggleGroup="$typeGroup"/>
+            </HBox>
+            <Label text="Taille visée :"/>
+            <Spinner fx:id="spinTaille2" min="1" max="40" initialValue="20" editable="true" />
+            <Label fx:id="lblInfoGroupes2" text="Estimation : 0 groupes" style="-fx-font-style: italic;"/>
+            <ComboBox fx:id="comboGloutons" promptText="Choisir un algo..." maxWidth="Infinity"/>
+            <Region VBox.vgrow="ALWAYS" />
+            <Button text="Lancer Algo" onAction="#genererGloutonListe" maxWidth="Infinity" style="-fx-base: #34495e; -fx-text-fill: white;"/>
+        </VBox>
+
+        <VBox spacing="10" style="-fx-border-color: #7f8c8d; -fx-padding: 10; -fx-border-radius: 5;" HBox.hgrow="ALWAYS">
+            <Label text="Groupes de la Promo" style="-fx-font-weight: bold;"/>
+            <ListView fx:id="listGroupes" VBox.vgrow="ALWAYS" />
+            <HBox spacing="10">
+                <Button text="Voir Membres" onAction="#voirMembres" />
+                <Button text="+ Commentaire" onAction="#ajouterCommentaire" />
+				<Button text="Supprimer le group" onAction="#suppgroup" />
+
+				<Button text="Supprimer le group" onAction="#suppgroup" />
+            </HBox>
+        </VBox>
+    </HBox>
+</VBox>

@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://bspmk2euofq8s"]
+
+[ext_resource type="Texture2D" uid="uid://cjj5gy8nbcbxq" path="res://assets/environment/pointLight.png" id="1_2epfp"]
+[ext_resource type="Script" uid="uid://by4lyw178tigh" path="res://scripts/SpawnPoint.gd" id="1_2j13v"]
+[ext_resource type="Texture2D" uid="uid://cgwbn83jpxdqm" path="res://assets/sprites/dot_particle.png" id="2_r8d50"]
+
+[sub_resource type="Gradient" id="Gradient_2epfp"]
+offsets = PackedFloat32Array(0, 0.54316545, 0.9784173)
+colors = PackedColorArray(1, 1, 1, 1, 0.22352941, 1, 0.078431375, 0.70980394, 0, 0.3019608, 0, 0.5254902)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_r8d50"]
+gradient = SubResource("Gradient_2epfp")
+
+[sub_resource type="Curve" id="Curve_2j13v"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.5103448, 0.7316911), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_rg8gv"]
+curve = SubResource("Curve_2j13v")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_ncryb"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(130, 1, 1)
+angle_min = 1.0728835e-05
+angle_max = 360.00003
+direction = Vector3(0, -1, 0)
+initial_velocity_min = 10.0
+initial_velocity_max = 100.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.03
+scale_max = 0.03
+scale_curve = SubResource("CurveTexture_rg8gv")
+color_ramp = SubResource("GradientTexture1D_r8d50")
+hue_variation_min = 0.049999975
+hue_variation_max = 0.049999975
+
+[node name="SpawnPoint" type="Node2D" unique_id=869544938]
+script = ExtResource("1_2j13v")
+
+[node name="PointLight2D" type="PointLight2D" parent="." unique_id=797549990]
+position = Vector2(1, 53)
+scale = Vector2(2, 0.5299653)
+color = Color(0.48171133, 0.75807405, 0.27773932, 1)
+energy = 2.0
+texture = ExtResource("1_2epfp")
+
+[node name="GPUParticles2D2" type="GPUParticles2D" parent="." unique_id=142248438]
+position = Vector2(0, 52)
+scale = Vector2(0.5200003, 1)
+amount = 40
+texture = ExtResource("2_r8d50")
+lifetime = 0.6
+randomness = 0.5
+process_material = SubResource("ParticleProcessMaterial_ncryb")

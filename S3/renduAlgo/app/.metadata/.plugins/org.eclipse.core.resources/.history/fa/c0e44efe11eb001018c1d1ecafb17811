@@ -1,0 +1,214 @@
+package controleurs;
+
+import java.util.Calendar;
+import java.util.Date;
+
+import Appli.main;
+import Base.Bac;
+import Base.Enseignant;
+import Base.Etudiant;
+import Base.Group;
+import Base.GroupTD;
+import Base.GroupTP;
+import Base.Matiere;
+import Base.Parcour;
+import Base.Promotion;
+import Base.Question;
+import Base.Repond;
+import Base.ReponsePossibilite;
+import Base.Semestre;
+import Base.Sondage;
+import Base.User;
+import Base.mainAlgo;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+
+public class LoginController {
+    @FXML private TextField loginField;
+    @FXML private PasswordField passwordField;
+    @FXML private Label errorLabel;
+    
+
+    @FXML
+    private void handleLogin() {
+
+        String user = loginField.getText();
+        String pass = passwordField.getText();
+
+
+        MainController mainCtrl = Appli.main.getMainController();
+
+        // ============================
+        //   1) Connexion Étudiant
+        // ============================
+        try {
+        	user = "jean.dupont@univ.fr";
+        	
+            for (int i = 0 ;i < Etudiant.ListEtu.length()-1;i++) {
+            	Etudiant e = Etudiant.ListEtu.get(i);
+            	System.out.println(e.getmailpro() +"  "+ e.getPassword());
+            	System.out.println(user +"  "+ pass);
+                if (e.getmailpro().equals(user) &&e.getPassword().equals(pass)) {
+                    main.setCurrentUser(e);
+                    mainCtrl.setRole(e.getRole());
+                    mainCtrl.chargerPage("VueinfoEtudiant.fxml");
+                    mainCtrl.setLogoutButtonVisible(true);
+                    System.out.println("Connexion Étudiant : " + e.getNomComplet());
+                    System.out.println("INT");
+                    return;
+                }
+            }
+
+            // ============================
+            //   2) Connexion Enseignant
+            // ============================
+            for (Enseignant ens : Enseignant.ListEnseignant) {
+                if (ens.getMailProEnsei().equals(user) && ens.getPassword().equals(pass)){
+                    main.setCurrentUser(ens);
+
+                    // Page selon rôle
+                    switch (ens.getRole()) {
+                        case "RESPONSABLE DE FORMATION":
+                        case "RESPONSABLE DE FILIÈRE":
+                        case "RESPONSABLE SEMESTRE":
+                        case "RESPONSABLE D’ANNÉE":
+                            mainCtrl.setRole(ens.getRole());
+                            mainCtrl.chargerPage("VueEnsembleResponsable.fxml");
+                            break;
+
+                        default:
+                            mainCtrl.setRole("ENSEIGNANT");
+                            mainCtrl.chargerPage("VueEnsembleEnseignant.fxml");
+                            break;
+                    }
+
+                    mainCtrl.setLogoutButtonVisible(true);
+                    System.out.println("Connexion Enseignant : " + ens.getNomComplet());
+                    return;
+                }
+            }
+
+        } catch (NumberFormatException e) {
+            errorLabel.setText("Identifiant invalide");
+            return;
+        }
+
+        errorLabel.setText("Identifiants incorrects");
+    }
+
+
+
+    public static void gene() {
+
+        // --- BACS ---
+        Bac general = new Bac(0, "general");
+        Bac techno = new Bac(1, "technologique");
+        Bac pro = new Bac(2, "pro");
+
+        // --- SEMESTRE & PROMOTIONS ---
+        Semestre s1 = new Semestre(0, "s1");
+        Promotion Promotion2025 = new Promotion(0, s1, 2025);
+        Promotion Promotion2024 = new Promotion(1, s1, 2024);
+
+        // --- PARCOURS ---
+        Parcour A = new Parcour(1, "dev");
+        Parcour B = new Parcour(2, "reseau");
+        Parcour C = new Parcour(3, "DB");
+
+        // --- MATIÈRES ---
+        Matiere maths = new Matiere(0, "maths");
+        Matiere anglais = new Matiere(1, "anglais");
+        Matiere physique = new Matiere(2, "physique");
+        Matiere francais = new Matiere(3, "francais");
+        Matiere devWeb = new Matiere(5, "Developement web");
+        Matiere cplus = new Matiere(6, "C");
+        Matiere csharp = new Matiere(7, "C#");
+        Matiere analyse = new Matiere(8, "Analyse");
+        Matiere coo = new Matiere(9, "Conception orientée objet");
+
+        // --- GROUPES TD/TP ---
+        
+		mainAlgo.CreationGroup2(s1, general, techno, pro, Promotion2025, A, B, C,60);
+		mainAlgo.CreationGroup2(s1, general, techno, pro, Promotion2024, A, B, C,60);
+         
+        // ============================================================
+        //                CRÉATION DE PLUSIEURS ENSEIGNANTS
+        // ============================================================
+
+        Enseignant e1 = new Enseignant(
+                1, "Dupont", "Jean", "Homme",
+                "jean.dupont@univ.fr", "j.dupont@gmail.com",
+                "12 rue de la Paix, Paris", "RESPONSABLE DE FORMATION"
+        );
+
+        Enseignant e2 = new Enseignant(
+                2, "Martin", "Sophie", "Femme",
+                "sophie.martin@univ.fr", "s.martin@gmail.com",
+                "8 avenue Victor Hugo, Paris", "ENSEIGNANT"
+        );
+
+        Enseignant e3 = new Enseignant(
+                3, "Bernard", "Luc", "Homme",
+                "luc.bernard@univ.fr", "l.bernard@gmail.com",
+                "5 rue Nationale, Paris", "RESPONSABLE SEMESTRE"
+        );
+
+        Enseignant e4 = new Enseignant(
+                4, "Moreau", "Claire", "Femme",
+                "claire.moreau@univ.fr", "c.moreau@gmail.com",
+                "10 rue Lafayette, Paris", "ENSEIGNANT"
+        );
+
+        // --- ASSIGNATION DES MATIÈRES ---
+        e1.addMatiere(devWeb);
+        e1.addMatiere(analyse);
+
+        e2.addMatiere(maths);
+        e2.addMatiere(physique);
+
+        e3.addMatiere(anglais);
+        e3.addMatiere(francais);
+
+        e4.addMatiere(coo);
+        e4.addMatiere(csharp);
+
+
+        // ============================================================
+        //                CRÉATION D’UN ÉTUDIANT + SONDAGE
+        // ============================================================
+
+        Etudiant test = new Etudiant(
+                500, "paul", "pierre", "Homme",
+                "mail", "mail", "rue",
+                general, Promotion2025, A
+        );
+
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MONTH, -1);
+        Date debut = cal.getTime();
+        cal.add(Calendar.MONTH, 2);
+        Date fin = cal.getTime();
+
+        Sondage sondage1 = new Sondage(1, "Voeux Spécialités", true, Promotion2025, debut, fin);
+
+        Question q1 = new Question(1, "Quelle option choisissez-vous ?");
+        ReponsePossibilite rA = new ReponsePossibilite(1, "Développement Mobile");
+        ReponsePossibilite rB = new ReponsePossibilite(2, "Cybersécurité");
+
+        q1.addReponsePossibilite(rA);
+        q1.addReponsePossibilite(rB);
+        sondage1.addQuestion(q1);
+
+        Repond.ListRepond.add(new Repond(test, sondage1, q1, "Oui"));
+
+        // ============================================================
+        //                RETOURNE UN ENSEIGNANT PRINCIPAL
+        // ============================================================
+
+       
+    }
+
+    
+    
+    
+}

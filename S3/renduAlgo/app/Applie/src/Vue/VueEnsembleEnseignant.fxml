@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox style="-fx-background-color: #f4f4f4;" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controleurs.EnseignantController">
+    <fx:include fx:id="navBar" source="NavBar.fxml" />
+
+    <children>
+        <Label text="Tableau de Bord Enseignant" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+        <HBox spacing="20" alignment="CENTER">
+            <VBox alignment="CENTER" prefWidth="200" prefHeight="80" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+                <Label text="Étudiants" style="-fx-text-fill: #7f8c8d;"/>
+                <Label fx:id="lblTotalEtudiants" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #3498db;"/>
+            </VBox>
+            <VBox alignment="CENTER" prefWidth="200" prefHeight="80" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+                <Label text="Groupes" style="-fx-text-fill: #7f8c8d;"/>
+                <Label fx:id="lblTotalGroupes" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2ecc71;"/>
+            </VBox>
+            <VBox alignment="CENTER" prefWidth="200" prefHeight="80" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+                <Label text="Promotions" style="-fx-text-fill: #7f8c8d;"/>
+                <Label fx:id="lblTotalPromos" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #e67e22;"/>
+            </VBox>
+            <VBox alignment="CENTER" prefWidth="200" prefHeight="80" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+                <Label text="Moyenne du group" style="-fx-text-fill: #7f8c8d;"/>
+                <Label fx:id="lblMoyGroup" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: blue;"/>
+            </VBox>
+        </HBox>
+
+        <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-background-color: #ebedef; -fx-padding: 10; -fx-background-radius: 5;">
+            <Label text="Filtrer par :" style="-fx-font-weight: bold;" />
+            <ComboBox fx:id="comboPromo" promptText="Promotion" prefWidth="150" />
+            <ComboBox fx:id="comboGroupe" promptText="Groupe" prefWidth="150" />
+            <Button text="Réinitialiser" onAction="#reinitialiserFiltres" style="-fx-background-color: #95a5a6; -fx-text-fill: white;" />
+        </HBox>
+
+        <TableView fx:id="tableEtudiants" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colNom" text="Nom" prefWidth="120"/>
+                <TableColumn fx:id="colPrenom" text="Prénom" prefWidth="120"/>
+                <TableColumn fx:id="colGroupe" text="Groupe" prefWidth="100"/>
+                <TableColumn fx:id="colMoyenne" text="Moyenne" prefWidth="100"/>
+                <TableColumn fx:id="colMail" text="Mail" prefWidth="200"/>
+            </columns>
+        </TableView>
+    </children>
+</VBox>

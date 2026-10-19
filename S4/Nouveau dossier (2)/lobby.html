@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reach The Door - Lobby</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            background: #0a0a0a;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .container {
+            background: rgba(20, 20, 20, 0.8);
+            padding: 40px;
+            border-radius: 30px;
+            border: 2px solid #5bbeec;
+            box-shadow: 0 0 50px rgba(0, 123, 255, 0.2);
+        }
+
+        .logo {
+            max-width: 400px;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #FFD700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .qr-wrapper {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            display: inline-block;
+            margin: 20px 0;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .instruction {
+            font-size: 1.2rem;
+            color: #ccc;
+            margin-top: 15px;
+        }
+
+        .highlight {
+            color: #00c3ff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="logo_jeu.png" alt="Reach The Door Logo" class="logo">
+        
+        <h1>Rejoindre la partie</h1>
+        
+        <div class="qr-wrapper">
+            <div id="qrcode"></div>
+        </div>
+
+        <p class="instruction">
+            Scanne le <span class="highlight">QR Code</span> pour <br>
+            transformer ton smartphone en manette !
+        </p>
+    </div>
+
+    <script>
+        // L'URL vers laquelle le QR code va rediriger
+        // On utilise la même URL que ton websocket mais en HTTPS
+        const controllerUrl = "https://yhassa4.github.io/manette-jeu/";
+
+        // Génération du QR Code
+        new QRCode(document.getElementById("qrcode"), {
+            text: controllerUrl,
+            width: 256,
+            height: 256,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    </script>
+</body>
+</html>

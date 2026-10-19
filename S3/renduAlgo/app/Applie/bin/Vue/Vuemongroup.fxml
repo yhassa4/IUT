@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controleurs.GroupesController">
+    <fx:include fx:id="navBar" source="NavBar.fxml" />
+
+    <VBox spacing="15" style="-fx-padding: 30;">
+        <Label text="Mes Groupes" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        
+        <HBox spacing="15" alignment="CENTER_LEFT">
+            <ComboBox fx:id="groupeCombo" prefWidth="150" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="lblCompteur" text="Nombre d'étudiants : 0" />
+        </HBox>
+
+        <TableView fx:id="tableEtudiant" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colNom" text="Nom" prefWidth="120" />
+                <TableColumn fx:id="colPrenom" text="Prénom" prefWidth="120" />
+                <TableColumn fx:id="colGenre" text="Genre" prefWidth="80" />
+                <TableColumn fx:id="colBac" text="Type de Bac" prefWidth="120" />
+                <TableColumn fx:id="colMail" text="Mail Pro" prefWidth="200" />
+                <TableColumn fx:id="colGroupe" text="Groupe" prefWidth="120" />
+            </columns>
+        </TableView>
+    </VBox>
+</VBox>

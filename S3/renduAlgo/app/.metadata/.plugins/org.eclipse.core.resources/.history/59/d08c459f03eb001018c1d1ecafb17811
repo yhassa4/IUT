@@ -1,0 +1,149 @@
+package Base;
+import java.util.ArrayList;
+
+public class Enseignant implements User {
+    private int numEnsei;
+    private String nomEnsei;
+    private String prenomEnsei;
+    private String genreEnsei;
+    private String mailProEnsei;
+    private String mailPersoEnsei;
+    private String addrEnsei;
+    private final String password  = "pass";
+    private String role; // Défini par le constructeur
+    public static ArrayList<Enseignant> ListEnseignant = new ArrayList<>();
+    // Listes d'objets pour les cours et matières
+    private ArrayList<Matiere> matiereEnsei = new ArrayList<>();
+    public ArrayList<AffectationEnseignant> mesCours = new ArrayList<>();
+    
+
+    public Enseignant(int numEnsei, String nomEnsei, String prenomEnsei, String genreEnsei, 
+                      String mailProEnsei, String mailPersoEnsei, String addrEnsei, String role) {
+        this.numEnsei = numEnsei;
+        this.nomEnsei = nomEnsei;
+        this.prenomEnsei = prenomEnsei;
+        this.setGenreEnsei(genreEnsei);
+        this.mailProEnsei = mailProEnsei;
+        this.mailPersoEnsei = mailPersoEnsei;
+        this.addrEnsei = addrEnsei;
+   
+        role = role.trim().toUpperCase();
+        this.role = role;
+        switch (role) {
+            case "RESPONSABLE D’ANNÉE":
+                break;
+            case "RESPONSABLE SEMESTRE":
+                break;
+            case "RESPONSABLE DE FORMATION":
+                break;
+            case "RESPONSABLE DE FILIÈRE":
+                break;
+            default:
+                this.role = "ENSEIGNANT";
+                break;
+        }
+        ListEnseignant.add(this);
+    }
+    
+
+    // Getters / Setters
+    public int getNumEnsei() { return numEnsei; }
+    public String getNomEnsei() { return nomEnsei; }
+    public String getPrenomEnsei() { return prenomEnsei; }
+    public String getMailProEnsei() { return mailProEnsei; }
+    public String getPassword() {return this.password;}
+
+    @Override
+    public String getRole() { return this.role; }
+    @Override
+    public String getNomComplet() { return prenomEnsei + " " + nomEnsei; }
+
+	@Override
+	public String getNom() {
+		return this.nomEnsei;
+	}
+
+	@Override
+	public String getPrenom() {
+		return this.prenomEnsei;
+	}
+	public ArrayList<Matiere> getMatiereEnsei(){
+		return matiereEnsei;
+	}
+	public void addMatiere(Matiere m) {
+		if(!matiereEnsei.contains(m)) {
+			matiereEnsei.add(m);
+		}
+	}
+	public void ajouterCours(Matiere m, GroupTD td, GroupTP tp) {
+	    this.mesCours.add(new AffectationEnseignant(m, td, tp));
+	}
+	public String getMatierePourGroupe(IGroup groupeSelectionne) {
+        if (groupeSelectionne == null) return "";
+        String retour = "" ;
+        
+        for (AffectationEnseignant aff : mesCours) {
+            if (groupeSelectionne instanceof GroupTD && aff.getGroupeTD() != null) {
+                if (aff.getGroupeTD().equals(groupeSelectionne)) {
+                	retour += aff.getMatiere().getNomMatiere() + " , ";
+                }
+            }
+            // Vérification si c'est le bon TP
+            if (groupeSelectionne instanceof GroupTP && aff.getGroupeTP() != null) {
+                if (aff.getGroupeTP().equals(groupeSelectionne)) {
+                	retour += aff.getMatiere().getNomMatiere() + " , ";
+                }
+            }
+        }
+        return retour;
+    }
+
+    /**
+     * Retourne la liste de toutes les matières uniques enseignées par cet enseignant
+     */
+    public ArrayList<String> getToutesLesMatieres() {
+    	ArrayList<String> r = new ArrayList<String>();
+    	for(Matiere m :matiereEnsei) {
+    		r.add(m.getNomMatiere());
+    	}
+    	
+    	
+        return r;
+    }
+
+	public String getGenreEnsei() {
+		return genreEnsei;
+	}
+
+	public void setGenreEnsei(String genreEnsei) {
+		this.genreEnsei = genreEnsei;
+	}
+	public void setrole(String role) {
+		this.role = role ;
+		
+	}
+	public ArrayList<IGroup> getGroup(){
+		ArrayList<IGroup> g = new ArrayList<IGroup>();
+		for(AffectationEnseignant a : mesCours) {
+			if(!g.contains(a.getGroupeTD())) {g.add(a.getGroupeTD());}
+			if(!g.contains(a.getGroupeTP())) {g.add(a.getGroupeTP());}
+		}
+		return g;
+	}
+	public ArrayList<Promotion> getPromos(){
+		ArrayList<IGroup> ListGroup = getGroup();
+		ArrayList<Promotion> promos = new ArrayList<Promotion>();
+		for(Group g : Group.ListGroup2) {
+			if(g.getGroupTD() != null) {
+				if(ListGroup.contains(g.getGroupTD())) {
+					if(!promos.contains(g.getPromo())){promos.add(g.getPromo())}
+					
+				}
+			}
+			if(promos.contains(this))
+	
+		}
+		return promos;
+	}
+	
+}

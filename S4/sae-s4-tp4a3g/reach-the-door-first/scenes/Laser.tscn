@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://b7hww5q3emv5a"]
+
+[ext_resource type="Texture2D" uid="uid://cgwbn83jpxdqm" path="res://assets/sprites/dot_particle.png" id="1_rx3qg"]
+[ext_resource type="Script" uid="uid://b3gfpqivs4u1i" path="res://scripts/Laser.gd" id="2_ag3aa"]
+
+[sub_resource type="Gradient" id="Gradient_ag3aa"]
+offsets = PackedFloat32Array(0, 0.9044118, 1)
+colors = PackedColorArray(0.68573314, 8.4228816e-07, 3.85046e-07, 1, 1, 0.35732567, 0.29020837, 1, 1, 0.47843137, 0.4117647, 0.54509807)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ha5if"]
+gradient = SubResource("Gradient_ag3aa")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_i5oxe"]
+particle_flag_align_y = true
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(1, 1, 1)
+direction = Vector3(0, 1, 0)
+spread = 0.3
+initial_velocity_min = 1500.0
+initial_velocity_max = 1500.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.03
+scale_max = 0.03
+color_ramp = SubResource("GradientTexture1D_ha5if")
+
+[sub_resource type="Gradient" id="Gradient_ev7mv"]
+offsets = PackedFloat32Array(0, 0.5514706, 1)
+colors = PackedColorArray(1, 0.7241138, 0.6548557, 1, 0.6249184, 0, 0.032004688, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_rhytt"]
+gradient = SubResource("Gradient_ev7mv")
+
+[sub_resource type="Curve" id="Curve_x51eq"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_yr4e3"]
+curve = SubResource("Curve_x51eq")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_0pep5"]
+particle_flag_disable_z = true
+direction = Vector3(0, -1, 0)
+spread = 70.0
+initial_velocity_min = 100.0
+initial_velocity_max = 300.0
+gravity = Vector3(0, 400, 0)
+scale_min = 0.049999997
+scale_max = 0.049999997
+scale_curve = SubResource("CurveTexture_yr4e3")
+color_ramp = SubResource("GradientTexture1D_rhytt")
+
+[node name="BeamParticles" type="GPUParticles2D" unique_id=1143387479]
+amount = 200
+texture = ExtResource("1_rx3qg")
+lifetime = 0.04
+fixed_fps = 0
+process_material = SubResource("ParticleProcessMaterial_i5oxe")
+script = ExtResource("2_ag3aa")
+
+[node name="ImpactParticles" type="GPUParticles2D" parent="." unique_id=1333468512]
+position = Vector2(0, 192)
+amount = 100
+texture = ExtResource("1_rx3qg")
+lifetime = 0.5
+fixed_fps = 0
+process_material = SubResource("ParticleProcessMaterial_0pep5")
+
+[node name="RayCast2D" type="RayCast2D" parent="." unique_id=1290525521]
+target_position = Vector2(0, 1000)
+collision_mask = 7

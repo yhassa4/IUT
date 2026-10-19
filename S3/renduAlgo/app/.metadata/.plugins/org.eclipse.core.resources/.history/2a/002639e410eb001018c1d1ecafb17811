@@ -1,0 +1,483 @@
+package controleurs;
+
+import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+import Appli.main;
+import Base.*; 
+
+
+public class EtudiantController {
+
+	@FXML private TableView<Etudiant> tableEtudiants;
+
+
+	@FXML private TableColumn<Etudiant, String> colNum;
+	@FXML private TableColumn<Etudiant, String> colNom;
+	@FXML private TableColumn<Etudiant, String> colPrenom;
+	@FXML private TableColumn<Etudiant, String> colgenre;
+
+
+	@FXML private TableColumn<Etudiant, String> colAddr;
+	@FXML private TableColumn<Etudiant, String> colMailperso;
+	@FXML private TableColumn<Etudiant, String> colMailpro;
+
+
+	@FXML private TableColumn<Etudiant, String> colPromo;
+	@FXML private TableColumn<Etudiant, String> colBac;
+	@FXML private TableColumn<Etudiant, String> colParcour;
+	@FXML private TableColumn<Etudiant, String> colCursus;
+	@FXML private TableColumn<Etudiant, String> colMoyenne;
+
+	@FXML private TableColumn<Etudiant, String> colgtd;
+	@FXML private TableColumn<Etudiant, String> colgtp;
+	@FXML private Button buttonImport , buttonExport ;
+	
+	
+    @FXML private ComboBox<Promotion> comboPromoFilter ;
+    @FXML private ComboBox<IGroup> combogroupFilter;
+    @FXML private Label lblStatus;
+    @FXML private NavBarController navBarController;
+
+    @FXML
+    public void initialize() {
+        configurerColonnes();
+        
+        // Configuration du filtre Promo 
+        comboPromoFilter.setItems(FXCollections.observableArrayList(Promotion.ListPromo));
+        
+        comboPromoFilter.setPromptText("tous");
+
+        comboPromoFilter.setOnAction(e -> filtrerTableau());
+     
+        actualiserTableau();
+        
+        Enseignant cUser = (Enseignant)main.getCurrentUser();
+        if(!cUser.getRole().equals("RESPONSABLE DE FILIÈRE")) {
+        	buttonImport.setVisible(false);
+        	buttonExport.setVisible(false);
+        }
+        
+        
+        navBarController.updateNav(1);
+        
+    }
+
+    private void configurerColonnes() {
+        colNum.setCellValueFactory(d -> new SimpleStringProperty(String.valueOf(d.getValue().getnum())));
+        colNom.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getNomEtu()));
+        colPrenom.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getPrenomEtu()));
+        colMailperso.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getmailpro()));
+        colMailpro.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getmailpro()));
+        colAddr.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getaddr()));
+        colgenre.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getGenre()));
+        colBac.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getBac().getNomBac()));
+        colParcour.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getParcour().getNomParcour()));
+        colCursus.setCellValueFactory(d -> {
+            if(d.getValue().getApprentissage())
+                return new SimpleStringProperty("Apprentissage");
+            return new SimpleStringProperty("Initial");
+        });
+        
+        
+        
+        // Affichage du nom de la promo
+        colPromo.setCellValueFactory(d -> {
+            if(d.getValue().getPromotion() != null)
+                return new SimpleStringProperty(d.getValue().getPromotion().getNomPromo());
+            return new SimpleStringProperty("N/A");
+        });
+
+        // Calcul de la moyenne pour l'affichage
+        colMoyenne.setCellValueFactory(d -> {
+            float moy = d.getValue().GetMoyenneGenerale();
+            return new SimpleStringProperty(String.format("%.2f / 20", moy));
+        });
+        
+        colgtd.setCellValueFactory(d -> {
+            String group = "null";
+            if(d.getValue().getGroup() != null) {if(d.getValue().getGroup().getGroupTD() != null) {group = d.getValue().getGroup().getGroupTD().getNomGroup();}}
+            return new SimpleStringProperty(group);
+        });
+        colgtp.setCellValueFactory(d -> {
+        	String group = "null";
+            if(d.getValue().getGroup() != null) {if(d.getValue().getGroup().getGroupTP() != null) {group = d.getValue().getGroup().getGroupTP().getNomGroup();}}
+            return new SimpleStringProperty(group);
+        });
+        
+        
+    }
+
+
+    private void actualiserTableau() {
+        ArrayList<Etudiant> listetu = new ArrayList<>();
+
+         for (int i = 0; i < Etudiant.ListEtu.length()-1; i++) {
+        	 listetu.add(Etudiant.ListEtu.get(i));
+         }
+
+        tableEtudiants.setItems(FXCollections.observableArrayList(listetu));
+        tableEtudiants.refresh();
+    }
+
+    @FXML
+    private void filtrerTableau() {
+        Promotion p = comboPromoFilter.getValue();
+        IGroup g = combogroupFilter.getValue();
+        ArrayList<Etudiant> filtre = new ArrayList<>();
+        if (p == null) {
+            actualiserTableau();
+        } else {
+            
+             for (int i = 0; i < Etudiant.ListEtu.length()-1; i++) {
+                Etudiant e = Etudiant.ListEtu.get(i);
+                if (e.getPromotion() != null && e.getPromotion().equals(p)) {
+                    filtre.add(e);
+                }
+            }
+            tableEtudiants.setItems(FXCollections.observableArrayList(filtre));
+        }
+        
+        ArrayList<IGroup> group = new ArrayList<>();
+        for(Etudiant e : filtre) {
+        	if(e.getGroup() != null) {
+        		if(e.getGroup().issetGroupTD() && e.getPromotion() == p) {
+        			if(!group.contains(e.getGroup().getGroupTD()))group.add(e.getGroup().getGroupTD());
+        		}
+        		if(!e.getGroup().issetGroupTP()&& e.getPromotion() == p) {
+        			if(group.contains(e.getGroup().getGroupTP()))group.add(e.getGroup().getGroupTP());
+        		}
+        	}
+        }
+        combogroupFilter.setItems(FXCollections.observableArrayList(group));
+        combogroupFilter.setPromptText("tous");
+        combogroupFilter.setOnAction(e -> filtrerTableau());
+        if(g !=null) {
+        ArrayList<Etudiant> filtre2 = new ArrayList<>();
+        for(Etudiant e : filtre) {
+        	if(e.getGroup() != null) {
+        		if(e.getGroup().issetGroupTD()) {
+        			if(!filtre2.contains(e) && g.getNomGroup().equals(e.getGroup().getGroupTD().getNomGroup()))filtre2.add(e);
+        		}
+        		if(e.getGroup().issetGroupTP()) {
+        			if(!filtre2.contains(e) && g.getNomGroup().equals(e.getGroup().getGroupTP().getNomGroup()))filtre2.add(e);
+        	        
+        		}
+        	}
+        }
+        tableEtudiants.setItems(FXCollections.observableArrayList(filtre2));
+        }
+    }
+    
+    @FXML private void resetFilter() {
+        comboPromoFilter.setValue(null);
+        combogroupFilter.setValue(null);
+        actualiserTableau();
+    }
+
+    //IMPORT CSV 
+    @FXML
+    private void importerNotes() {
+    	FileChooser fc = new FileChooser();
+        fc.setTitle("Importer Notes (CSV)");
+        
+      
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers CSV", "*.csv"));
+        File file = fc.showOpenDialog(null);
+        if (file == null) return;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+        	//entete
+            String ligne = br.readLine();
+            if (ligne == null) return;
+
+            int notesAjoutees = 0;
+            
+            // Lire chaque ligne de note
+            while ((ligne = br.readLine()) != null) {
+                if (ligne.trim().isEmpty()) continue;
+                
+                // On sépare par ";"
+                String[] data = ligne.split(";");
+                
+                if (data.length >= 7) {
+                    try {
+                        // Extraction des données de la ligne
+                        int idEtu = Integer.parseInt(data[0].trim());
+                        String nomSemestre = data[3].trim();
+                        String nomMatiere = data[4].trim();
+                        float noteMax = Float.parseFloat(data[5].replace(",", "."));
+                        float valeurNote = Float.parseFloat(data[6].replace(",", "."));
+
+                        // Recherche des objets correspondants
+                        Etudiant etu = trouverEtudiant(idEtu);
+                        Semestre sem = trouverSemestre(nomSemestre);
+                        Matiere mat = trouverMatiere(nomMatiere);
+
+                        if (etu != null && sem != null && mat != null) {
+                            // Création de la Note avec les données du CSV
+                            // Note(int NumNote, float valeur, float valeurMax, Etudiant etu, Semestre semestre, Matiere matiere)
+                            int idNoteUnique = (int)(Math.random() * 100000); 
+                            
+                            new Note(idNoteUnique, valeurNote, noteMax, etu, sem, mat);
+                            notesAjoutees++;
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Erreur format nombre sur la ligne : " + ligne);
+                    }
+                }
+            }
+            
+            lblStatus.setText("Succès : " + notesAjoutees + " notes importées.");
+            tableEtudiants.refresh();
+
+        } catch (Exception e) {
+            lblStatus.setText("Erreur : " + e.getMessage());
+        }
+    }
+
+    
+    @FXML
+    private void exporterDonnees() {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Exporter les données (CSV)");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers CSV", "*.csv"));
+        
+        //nom de fichier par défaut
+        fc.setInitialFileName("export_notes.csv");
+        
+        File file = fc.showSaveDialog(null);
+
+        if (file == null) return;
+
+        try (PrintWriter writer = new PrintWriter(file)) {
+            // Écriture de l'entête 
+            writer.println("NumEtu;Prenom;Nom;Semestre;Matiere;NoteMax;Note");
+
+            for (int i = 0 ;i<Etudiant.ListEtu.length();i++) {
+            	Etudiant etu = Etudiant.ListEtu.get(i);
+                // On récupère toutes les notes de cet étudiant
+                for (Note note : Note.GetNotes(etu)) {
+                    
+                    // Préparation des données
+                    int id = etu.getnum();
+                    String prenom = etu.getPrenomEtu();
+                    String nom = etu.getNomEtu();
+                    
+                    String sem = (note.getsemestre() != null) ? note.getsemestre().getNomSemestre() : "Inconnu";
+                    String mat = (note.getMatiere() != null) ? note.getMatiere().getNomMatiere() : "Inconnue";
+                    
+                    float noteMax = note.getValeurMax();
+                    float valeur = note.getValeur();
+
+                    writer.println(String.format(java.util.Locale.US, "%d;%s;%s;%s;%s;%.2f;%.2f", 
+                            id, prenom, nom, sem, mat, noteMax, valeur));
+                }
+            }
+
+            lblStatus.setText("Exportation réussie : " + file.getName());
+
+        } catch (Exception e) {
+            lblStatus.setText("Erreur lors de l'export : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+
+    private Etudiant trouverEtudiant(int id) {
+         for (int i = 0; i < Etudiant.ListEtu.length(); i++) {
+            if (Etudiant.ListEtu.get(i).getnum() == id) {
+                return Etudiant.ListEtu.get(i);
+            }
+        }
+        return null;
+    }
+    private Semestre trouverSemestre(String nom) {
+    	for(Semestre se :Semestre.ListSemestre) {
+    		if(se.getNomSemestre().equals(nom))return se ;
+    	}
+    	
+       return null;
+   }
+
+    private Matiere trouverMatiere(String nom) {
+        for (Matiere m : Matiere.toutesMatieres) {
+            if (m.getNomMatiere().equalsIgnoreCase(nom)) {
+                return m;
+            }
+        }
+        int num = Matiere.toutesMatieres.size() + 1;
+        return new Matiere(num, nom);
+    }
+    @FXML
+    private void ouvrirGestionNotes() {
+        Etudiant selection = tableEtudiants.getSelectionModel().getSelectedItem();
+        if (selection == null) {
+            lblStatus.setText("Sélectionnez un étudiant d'abord.");
+            return;
+        }
+
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Notes de " + selection.getNomComplet());
+        dialog.setResizable(true);
+        dialog.getDialogPane().setPrefSize(600, 700); 
+
+        dialog.getDialogPane().setMinHeight(500);
+        dialog.getDialogPane().setMinWidth(400);
+        
+        ButtonType boutonFermer = new ButtonType("Fermer", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().add(boutonFermer);
+
+        VBox layoutPrincipal = new VBox(15);
+        layoutPrincipal.setPadding(new Insets(15));
+
+        //Sélecteur de Semestre
+        ComboBox<Semestre> comboSem = new ComboBox<>();
+        comboSem.setItems(FXCollections.observableArrayList(Semestre.ListSemestre));
+        comboSem.setPromptText("Choisir le semestre");
+        
+        // Conteneur pour les moyennes qui se mettra à jour
+        VBox zoneMoyennes = new VBox(10);
+        ScrollPane scroll = new ScrollPane(zoneMoyennes);
+        scroll.setFitToWidth(true);
+        scroll.setPrefHeight(400);
+
+        comboSem.setOnAction(e -> {
+            zoneMoyennes.getChildren().clear();
+            Semestre s = comboSem.getValue();
+            if (s == null) return;
+
+            
+            
+            for (Matiere m : Matiere.toutesMatieres) {
+                Float moyenne = selection.GetMoyenneMatiere(m,s); 
+                
+                if (moyenne != null) {
+                    VBox blocMatiere = new VBox(5);
+                    blocMatiere.setStyle("-fx-border-color: #ccc; -fx-padding: 10; -fx-border-radius: 5;");
+                    
+                    Label lblMat = new Label(m.getNomMatiere() + " - Moyenne: " + String.format("%.2f/20", moyenne));
+                    lblMat.setStyle("-fx-font-weight: bold;");
+                    blocMatiere.getChildren().add(lblMat);
+
+                    // affichage de chaque notse de cette matière pour ce semestre
+                    ArrayList<Note> toutesNotes = Note.GetNotes(selection);
+                    for (Note n : toutesNotes) {
+                        if (n.getMatiere().equals(m) && n.getsemestre().equals(s)) {
+                            HBox ligneNote = new HBox(10);
+                            TextField editNote = new TextField(String.valueOf(n.getValeur()));
+                            editNote.setPrefWidth(60);
+                            
+                            Label lblMax = new Label("/ " + n.getValeurMax());
+                            Button btnSave = new Button("Modifier");
+                            
+                            btnSave.setOnAction(ev -> {
+                                try {
+                                    float nouvelleVal = Float.parseFloat(editNote.getText().replace(",", "."));
+                                    n.setValeur(nouvelleVal); 
+                                    lblStatus.setText("Note mise à jour !");
+                                    comboSem.getOnAction().handle(null); 
+                                } catch (Exception ex) {
+                                    lblStatus.setText("Erreur format note.");
+                                }
+                            });
+
+                            ligneNote.getChildren().addAll(new Label("Note:"), editNote, lblMax, btnSave);
+                            blocMatiere.getChildren().add(ligneNote);
+                        }
+                    }
+                    zoneMoyennes.getChildren().add(blocMatiere);
+                }
+            }
+        });
+
+        layoutPrincipal.getChildren().addAll(new Label("Sélectionnez un semestre :"), comboSem, scroll);
+        dialog.getDialogPane().setContent(layoutPrincipal);
+        dialog.showAndWait();
+    }
+    
+    
+    
+    @FXML
+    private void ModifierEtudiant() {
+        Etudiant selection = tableEtudiants.getSelectionModel().getSelectedItem();
+
+        if (selection == null) {
+            lblStatus.setText("Erreur : Sélectionnez un étudiant dans le tableau.");
+            return;
+        }
+
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Modifier l'étudiant : " + selection.getNomComplet());
+        dialog.setHeaderText("Modification des informations et de la promotion");
+
+        ButtonType boutonValider = new ButtonType("Enregistrer", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(boutonValider, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10); grid.setVgap(10);
+
+        TextField txtNom = new TextField(selection.getNomEtu());
+        TextField txtPrenom = new TextField(selection.getPrenomEtu());
+        TextField txtMail = new TextField(selection.getMailProEtu());
+
+        ComboBox<Promotion> comboPromo = new ComboBox<>();
+        ArrayList<Promotion> listeAvecNull = new ArrayList<>();
+        listeAvecNull.add(null); 
+        listeAvecNull.addAll(Promotion.ListPromo);
+        
+        comboPromo.setItems(FXCollections.observableArrayList(listeAvecNull));
+        comboPromo.setValue(selection.getPromotion()); // Valeur actuelle
+
+        // Formatter l'affichage de la promo car bug @
+        comboPromo.setConverter(new javafx.util.StringConverter<Promotion>() {
+            @Override
+            public String toString(Promotion p) {
+                return (p == null) ? "[Aucune / Retirer de la promo]" : p.getNomPromo();
+            }
+            @Override
+            public Promotion fromString(String s) { return null; }
+        });
+
+        grid.add(new Label("Nom :"), 0, 0); grid.add(txtNom, 1, 0);
+        grid.add(new Label("Prénom :"), 0, 1); grid.add(txtPrenom, 1, 1);
+        grid.add(new Label("Email Pro :"), 0, 2); grid.add(txtMail, 1, 2);
+        grid.add(new Label("Promotion :"), 0, 3); grid.add(comboPromo, 1, 3);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // Traitement de la modification
+        dialog.showAndWait().ifPresent(response -> {
+            if (response == boutonValider) {
+
+                selection.setNomEtu(txtNom.getText());
+                selection.setPrenomEtu(txtPrenom.getText());
+                try {
+                	if(!selection.getPromotion().equals(comboPromo.getValue())) {
+	                	selection.setPromo(comboPromo.getValue());
+	                	selection.unsetGroupTD();
+	                	selection.unsetGroupTP();
+                	}
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                actualiserTableau();
+                lblStatus.setText("Étudiant mis à jour avec succès.");
+            }
+        });
+    }
+    
+    
+}

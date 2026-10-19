@@ -1,0 +1,481 @@
+package controleurs;
+
+
+
+import Base.*;
+
+import javafx.fxml.FXML;
+
+import javafx.scene.control.*;
+
+import javafx.scene.layout.Priority;
+
+import javafx.scene.layout.VBox;
+
+import javafx.collections.FXCollections;
+
+import javafx.collections.ObservableList;
+
+import javafx.geometry.Insets;
+
+import javafx.stage.FileChooser;
+
+import java.io.File;
+
+import java.io.PrintWriter;
+
+import java.time.ZoneId;
+
+import java.util.Date;
+
+
+
+public class SondageController {
+
+
+
+    @FXML private TextField txtNomSondage;
+
+    @FXML private ComboBox<Promotion> comboPromo;
+
+    @FXML private DatePicker dateDebut, dateFin;
+
+    @FXML private ListView<String> listQuestionsTemporaires;
+
+    
+
+    @FXML private TableView<Sondage> tableSondages;
+
+    @FXML private TableColumn<Sondage, String> colNom, colPromo, colStatus;
+
+    @FXML private NavBarController navBarController;
+
+
+
+    private ObservableList<String> questionsEnAttente = FXCollections.observableArrayList();
+
+
+
+    @FXML
+
+    public void initialize() {
+
+        comboPromo.setItems(FXCollections.observableArrayList(Promotion.ListPromo));
+
+        listQuestionsTemporaires.setItems(questionsEnAttente);
+
+        
+
+        listQuestionsTemporaires.setCellFactory(lv -> new QuestionCell());
+
+
+
+        colNom.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getNomSondage()));
+
+        colPromo.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getPromo().getNomPromo()));
+
+        colStatus.setCellValueFactory(cell -> {
+
+            Sondage s = cell.getValue();
+
+            String statut = "";
+
+
+
+            if (s.estEnCours()) {
+
+                statut = "Actif";
+
+            } else if(s.estTerminer()){
+
+                statut = "date de debut : " + s.getdateDebut();
+
+            }else {
+
+            statut = "Terminé";
+
+            }
+
+            
+
+            return new javafx.beans.property.SimpleStringProperty(statut);
+
+        });
+
+        navBarController.updateNav(3);
+
+        actualiserTableau();
+
+    }
+
+
+
+    private void actualiserTableau() {
+
+        tableSondages.setItems(FXCollections.observableArrayList(Sondage.Sondages));
+
+    }
+
+
+
+    @FXML
+
+    private void ajouterQuestionALaListe() {
+
+        // 1. Demander l'intitulé de la question
+
+        TextInputDialog questDialog = new TextInputDialog();
+
+        questDialog.setTitle("Nouvelle Question");
+
+        questDialog.setHeaderText("veuillez entrer la question");
+
+        questDialog.setContentText("Texte :");
+
+
+
+        questDialog.showAndWait().ifPresent(texte -> {
+
+            if (texte.trim().isEmpty()) return;
+
+
+
+            
+
+            TextInputDialog choixDialog = new TextInputDialog();
+
+            choixDialog.setTitle("Réponses possibles");
+
+            choixDialog.setHeaderText("Veulliez entrer les reponses possible (Optionnel)");
+
+            choixDialog.setContentText("Entrez les choix séparés par ';' (ex: Oui;Non)\nLaissez vide pour une réponse libre :");
+
+            
+
+            choixDialog.showAndWait().ifPresent(choix -> {
+
+                String stockage = texte;
+
+                if (!choix.trim().isEmpty()) {
+
+                    stockage += "|" + choix; 
+
+                }
+
+                questionsEnAttente.add(stockage);
+
+            });
+
+        });
+
+    }
+
+
+
+    @FXML
+
+    private void creerSondage() {
+
+        if (txtNomSondage.getText().isEmpty() || comboPromo.getValue() == null || questionsEnAttente.isEmpty()) {
+
+            System.out.println("Formulaire incomplet");
+
+            return;
+
+        }
+
+
+
+        try {
+
+            String nom = txtNomSondage.getText();
+
+            Promotion p = comboPromo.getValue();
+
+            Date debut = Date.from(dateDebut.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+            Date fin = Date.from(dateFin.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+
+
+            Sondage nouveauSondage = new Sondage(Sondage.Sondages.size() + 1, nom, true, p, debut, fin);
+
+            
+
+            for (String qInfo : questionsEnAttente) {
+
+                String[] parts = qInfo.split("\\|");
+
+                Question q = new Question(Question.ListQuestion.size() + 1, parts[0]);
+
+                
+
+                // Si la question a des choix (format: Question|Choix1;Choix2)
+
+                if (parts.length > 1) {
+
+                    String[] choixPossibles = parts[1].split(";");
+
+                    for (int i = 0; i < choixPossibles.length; i++) {
+
+                        q.addReponsePossibilite(new ReponsePossibilite(i + 1, choixPossibles[i]));
+
+                    }
+
+                }
+
+                nouveauSondage.addQuestion(q);
+
+            }
+
+
+
+            questionsEnAttente.clear();
+
+            txtNomSondage.clear();
+
+            actualiserTableau();
+
+            
+
+        } catch (Exception e) {
+
+            System.err.println("Erreur de saisie/dates");
+
+        }
+
+    }
+
+
+
+    @FXML
+
+    private void ouvrirDetailReponses() {
+
+        Sondage selection = tableSondages.getSelectionModel().getSelectedItem();
+
+        if (selection == null) return;
+
+
+
+        Dialog<Void> dialog = new Dialog<>();
+
+        dialog.setTitle("Réponses détaillées : " + selection.getNomSondage());
+
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+
+        dialog.getDialogPane().setPrefSize(800, 600);
+
+
+
+        VBox mainLayout = new VBox(15);
+
+        mainLayout.setPadding(new Insets(15));
+
+
+
+        // Barre de recherche
+
+        TextField searchField = new TextField();
+
+        searchField.setPromptText("Rechercher un étudiant...");
+
+        
+
+        VBox contentArea = new VBox(15);
+
+        ScrollPane scroll = new ScrollPane(contentArea);
+
+        scroll.setFitToWidth(true);
+
+        VBox.setVgrow(scroll, Priority.ALWAYS);
+
+
+
+        // LOGIQUE DE FILTRAGE ET D'AFFICHAGE
+
+        Runnable rafraichir = () -> {
+
+            contentArea.getChildren().clear();
+
+            String filtre = searchField.getText().toLowerCase();
+
+
+
+            
+
+            for (int i = 0 ;i<Etudiant.ListEtu.length()-1 ;i++) {
+
+            Etudiant etu = Etudiant.ListEtu.get(i);
+
+                if (etu.getPromotion().equals(selection.getPromo())) {
+
+                    
+
+                    // Filtre de recherche sur le nom
+
+                    if (!filtre.isEmpty() && !etu.getNomComplet().toLowerCase().contains(filtre)) continue;
+
+
+
+                    // Création d'un bloc par étudiant
+
+                    VBox card = new VBox(10);
+
+                    card.setStyle("-fx-background-color: white; -fx-padding: 15; -fx-border-color: #bdc3c7; -fx-border-radius: 10;");
+
+                    
+
+                    Label nameLabel = new Label("👤 Étudiant : " + etu.getNomComplet());
+
+                    nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2980b9;");
+
+                    card.getChildren().add(nameLabel);
+
+
+
+                    Separator sep = new Separator();
+
+                    card.getChildren().add(sep);
+
+
+
+                    // On cherche toutes les réponses de cet étudiant pour CE sondage
+
+                    boolean aRepondu = false;
+
+                    for (Repond r : Repond.ListRepond) {
+
+                        if (r.getEtudiant().equals(etu) && r.getSondage().equals(selection)) {
+
+                            aRepondu = true;
+
+                            
+
+                            // Affichage Question -> Réponse
+
+                            VBox qBox = new VBox(2);
+
+                            Label lblQ = new Label("Question : " + r.getQuestion().getTextQuestion()); 
+
+                            lblQ.setStyle("-fx-font-style: italic; -fx-text-fill: #7f8c8d;");
+
+                            
+
+                            Label lblR = new Label("↳ " + r.getreponseDonnee());
+
+                            lblR.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+                            lblR.setWrapText(true);
+
+                            
+
+                            qBox.getChildren().addAll(lblQ, lblR);
+
+                            card.getChildren().add(qBox);
+
+                        }
+
+                    }
+
+
+
+                    if (!aRepondu) {
+
+                        card.getChildren().add(new Label("Pas encore de réponse pour ce sondage."));
+
+                        card.setOpacity(0.6); // Griser l'étudiant s'il n'a pas répondu
+
+                    }
+
+
+
+                    contentArea.getChildren().add(card);
+
+                }
+
+            }
+
+        };
+
+
+
+        searchField.textProperty().addListener((obs, old, newVal) -> rafraichir.run());
+
+        rafraichir.run();
+
+
+
+        mainLayout.getChildren().addAll(new Label("Recherche d'étudiant :"), searchField, scroll);
+
+        dialog.getDialogPane().setContent(mainLayout);
+
+        dialog.showAndWait();
+
+    }
+
+
+
+    @FXML
+
+    private void exporterCSV() {
+
+        Sondage selection = tableSondages.getSelectionModel().getSelectedItem();
+
+        if (selection == null) return;
+
+
+
+        FileChooser fc = new FileChooser();
+
+        fc.setInitialFileName("Resultats_" + selection.getNomSondage() + ".csv");
+
+        File file = fc.showSaveDialog(tableSondages.getScene().getWindow());
+
+
+
+        if (file != null) {
+
+            try (PrintWriter writer = new PrintWriter(file)) {
+
+                // En-tête : on ajoute la colonne Question
+
+                writer.println("numEtudiant;nom;prenom;Promotion;Question;Reponse");
+
+
+
+                for (Repond r : Repond.ListRepond) {
+
+                    if (r.getSondage().equals(selection)) {
+
+                        writer.println(r.getEtudiant().getnum()+ ";" +
+
+                        r.getEtudiant().getNom()+ ";" +
+
+                            r.getEtudiant().getPrenom() + ";" +
+
+                            selection.getPromo().getNomPromo() + ";" +
+
+                            r.getQuestion().getTextQuestion() + ";" + 
+
+                            r.getreponseDonnee()
+
+                        );
+
+                    }
+
+                }
+
+                System.out.println("Exportation terminée.");
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+
+            }
+
+        }
+
+    }
+
+}

@@ -1,0 +1,108 @@
+package controleurs;
+
+import Appli.main;
+import Base.*;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import java.util.Optional;
+
+public class infoEtudiantController {
+
+    @FXML private Label numEtuLabel;
+    @FXML private Label nomEtuLabel;
+    @FXML private Label prenomEtuLabel;
+    @FXML private Label genreEtuLabel;
+    @FXML private Label mailProEtuLabel;
+    @FXML private Label mailPersoEtuLabel;
+    @FXML private Label addrEtuLabel;
+    @FXML private NavBarController navBarController;
+    
+    // Nouveau : Container pour afficher le bouton de sondage
+    @FXML private VBox sondageContainer; 
+    @FXML private Label sondageStatusLabel;
+
+    @FXML
+    public void initialize() {
+        Etudiant cUser = (Etudiant)main.getCurrentUser();
+        
+        // Chargement des infos existantes
+        numEtuLabel.setText(cUser.getnum()+"");
+        nomEtuLabel.setText(cUser.getNomEtu());
+        prenomEtuLabel.setText(cUser.getPrenomEtu());
+        genreEtuLabel.setText(cUser.getGenreEtu());
+        mailProEtuLabel.setText(cUser.getmailpro());
+        mailPersoEtuLabel.setText(cUser.getmailperso());
+        addrEtuLabel.setText(cUser.getaddr());
+        
+        if(navBarController != null) navBarController.updateNav(0);
+        
+        verifierSondages(cUser);
+    }
+
+    private void verifierSondages(Etudiant etu) {
+        // Chercher un sondage en cours pour la promo de l'étudiant
+        Sondage sondageActif = null;
+        for (Sondage s : Sondage.Sondages) {
+            if (s.getPromo().equals(etu.getPromo()) && s.estEnCours()) {
+                // Vérifier si l'étudiant n'a pas déjà répondu
+                if (!aDejaRepondu(etu, s)) {
+                    sondageActif = s;
+                    break;
+                }
+            }
+        }
+
+        if (sondageActif != null) {
+            sondageStatusLabel.setText("Un sondage est disponible : " + sondageActif.getNomSondage());
+            Button btnRepondre = new Button("Répondre au sondage");
+            btnRepondre.setStyle("-fx-background-color: #a50044; -fx-text-fill: white; -fx-cursor: hand;");
+            
+            final Sondage sToAnswer = sondageActif;
+            btnRepondre.setOnAction(e -> ouvrirFormulaireSondage(etu, sToAnswer));
+            sondageContainer.getChildren().add(btnRepondre);
+        }
+    }
+
+    private boolean aDejaRepondu(Etudiant etu, Sondage s) {
+        for (Repond r : Repond.ListRepond) {
+            if (r.getEtudiant().equals(etu) && r.getSondage().equals(s)) return true;
+        }
+        return false;
+    }
+
+    private void ouvrirFormulaireSondage(Etudiant etu, Sondage s) {
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle(s.getNomSondage());
+        dialog.setHeaderText("Merci de répondre aux questions suivantes :");
+        ButtonType submitButtonType = new ButtonType("Envoyer", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(submitButtonType, ButtonType.CANCEL);
+
+        VBox content = new VBox(15);
+        // Pour chaque question, on crée un champ de texte (ou des boutons radios selon votre typeSondage)
+        for (Question q : s.getQuestions()) {
+            VBox qBox = new VBox(5);
+            qBox.getChildren().add(new Label(q.getTextQuestion()));
+            TextField answerField = new TextField();
+            answerField.setUserData(q); // On stocke la question dans le champ
+            qBox.getChildren().add(answerField);
+            content.getChildren().add(qBox);
+        }
+
+        dialog.getDialogPane().setContent(content);
+
+        Optional<Void> result = dialog.showAndWait();
+        if (dialog.getResult() != null) { // Si "Envoyer"
+            for (javafx.scene.Node node : content.getChildren()) {
+                if (node instanceof VBox) {
+                    TextField tf = (TextField) ((VBox) node).getChildren().get(1);
+                    Question q = (Question) tf.getUserData();
+                    // Création de la réponse dans la base
+                    new Repond(etu, s, q, tf.getText());
+                }
+            }
+            sondageContainer.getChildren().clear();
+            sondageStatusLabel.setText("Merci pour votre participation !");
+        }
+    }
+}

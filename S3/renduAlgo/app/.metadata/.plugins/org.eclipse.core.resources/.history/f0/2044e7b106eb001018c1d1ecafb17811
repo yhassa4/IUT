@@ -1,0 +1,217 @@
+package controleurs;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.ArrayList;
+
+import Appli.main;
+import Base.*;
+
+public class EnseignantController {
+
+    @FXML private Label lblTotalEtudiants, lblTotalGroupes, lblTotalPromos, lblMoyGroup;
+    @FXML private TableView<Etudiant> tableEtudiants;
+    @FXML private TableColumn<Etudiant, String> colNom, colPrenom, colMail, colGroupe, colMoyenne;
+    @FXML private ComboBox<String> comboPromo, comboGroupe;
+    @FXML private NavBarController navBarController;
+
+    // Liste des étudiants liés à l'enseignant
+    private ObservableList<Etudiant> listEtuAffichee = FXCollections.observableArrayList();
+
+    @FXML
+    public void initialize() {
+        // --- 1. Configuration des Colonnes ---
+        colNom.setCellValueFactory(new PropertyValueFactory<>("nomEtu"));
+        colPrenom.setCellValueFactory(new PropertyValueFactory<>("prenomEtu"));
+        colMail.setCellValueFactory(new PropertyValueFactory<>("mailProEtu"));
+        Enseignant cUser2 = (Enseignant) main.getCurrentUser();
+        ArrayList<IGroup> mesGroupes = cUser2.getGroup(); 
+        System.out.println("Taille ListEtu: " + Etudiant.ListEtu.length());
+
+        System.out.println("DEBUG: Prof connecté = " + cUser2.getNomComplet());
+        System.out.println("DEBUG: Nombre de groupes du prof = " + mesGroupes.size());
+        
+        colGroupe.setCellValueFactory(cellData -> {
+            Etudiant e = cellData.getValue();
+            if (e == null || e.getGroup() == null) return new SimpleStringProperty("-");
+            Group g = e.getGroup();
+            String td = g.issetGroupTD() ? g.getGroupTD().getNomGroupTD() : "";
+            String tp = g.issetGroupTP() ? g.getGroupTP().getNomGroupTP() : "";
+            
+            if (!td.isEmpty() && !tp.isEmpty()) return new SimpleStringProperty(td + " / " + tp);
+            return new SimpleStringProperty(td.isEmpty() ? tp : td);
+        });
+
+        colMoyenne.setCellValueFactory(cellData -> {
+            float moy = cellData.getValue().GetMoyenneGenerale();
+            return new SimpleStringProperty(String.format("%.2f", moy));
+        });
+
+        // --- 2. Chargement des données ---
+        chargerDonnees();
+
+        // --- 3. Gestion des événements ---
+        comboPromo.setOnAction(e -> appliquerFiltre());
+        comboGroupe.setOnAction(e -> {
+            appliquerFiltre();
+            reloadMoy();
+        });
+
+        // --- 4. Gestion de la Navbar ---
+        Enseignant cUser = (Enseignant) main.getCurrentUser();
+        // Correction : Utilisation de equals pour comparer les String
+        if (!"ENSEIGNANT".equals(cUser.getRole())) {
+            navBarController.updateNav(2);
+        }
+    }
+
+    private void chargerDonnees() {
+        Enseignant cUser = (Enseignant) main.getCurrentUser();
+        
+        // 1. On récupère les NOMS des groupes du prof (plus fiable)
+        ArrayList<String> nomsMesGroupes = new ArrayList<>();
+        for (IGroup g : cUser.getGroup()) {
+            if (g != null) {
+                if (g instanceof GroupTD) nomsMesGroupes.add(((GroupTD) g).getNomGroupTD());
+                if (g instanceof GroupTP) nomsMesGroupes.add(((GroupTP) g).getNomGroupTP());
+            }
+        }
+
+        Set<String> nomsPromos = new HashSet<>();
+        Set<String> nomsGroupesFiltre = new HashSet<>();
+        ArrayList<Etudiant> listeTemporaire = new ArrayList<>();
+
+        // 2. PARCOURS de ta classe Tree.List
+        // Attention : length() est la bonne méthode, mais n'utilise pas -1
+        int tailleArbre = Etudiant.ListEtu.length();
+        
+        for (int i = 0; i < tailleArbre; i++) {
+            Etudiant e = Etudiant.ListEtu.get(i); // Utilise ta méthode get(i)
+            
+            if (e != null && e.getGroup() != null) {
+                boolean estMonEtudiant = false;
+
+                // Vérification TD
+                if (e.getGroup().issetGroupTD()) {
+                    String nomTD = e.getGroup().getGroupTD().getNomGroupTD();
+                    if (nomsMesGroupes.contains(nomTD)) {
+                        estMonEtudiant = true;
+                        nomsGroupesFiltre.add(nomTD);
+                    }
+                }
+
+                // Vérification TP
+                if (!estMonEtudiant && e.getGroup().issetGroupTP()) {
+                    String nomTP = e.getGroup().getGroupTP().getNomGroupTP();
+                    if (nomsMesGroupes.contains(nomTP)) {
+                        estMonEtudiant = true;
+                        nomsGroupesFiltre.add(nomTP);
+                    }
+                }
+
+                if (estMonEtudiant) {
+                    listeTemporaire.add(e);
+                    if (e.getPromotion() != null) {
+                        nomsPromos.add(e.getPromotion().getNomPromo());
+                    }
+                }
+            }
+        }
+
+        // 3. Mise à jour de l'ObservableList de JavaFX
+        // On convertit ta structure personnalisée vers une liste compatible JavaFX
+        listEtuAffichee.setAll(listeTemporaire);
+        tableEtudiants.setItems(listEtuAffichee);
+
+        comboPromo.setItems(FXCollections.observableArrayList(nomsPromos).sorted());
+        comboGroupe.setItems(FXCollections.observableArrayList(nomsGroupesFiltre).sorted());
+
+        lblTotalEtudiants.setText(String.valueOf(listEtuAffichee.size()));
+    }
+
+    private void reloadMoy() {
+        String groupeSelectionne = comboGroupe.getValue();
+        
+        if (groupeSelectionne == null || groupeSelectionne.isEmpty()) {
+            lblMoyGroup.setText("0.00");
+            return;
+        }
+
+        float somme = 0;
+        int cpt = 0;
+
+        // On parcourt uniquement les étudiants déjà filtrés (ceux du prof)
+        for (Etudiant etu : listEtuAffichee) {
+            boolean appartientAuGroupeSelectionne = false;
+            
+            if (etu.getGroup() != null) {
+                // Vérif TD
+                if (etu.getGroup().issetGroupTD() && 
+                    etu.getGroup().getGroupTD().getNomGroupTD().equals(groupeSelectionne)) {
+                    appartientAuGroupeSelectionne = true;
+                }
+                // Vérif TP
+                else if (etu.getGroup().issetGroupTP() && 
+                         etu.getGroup().getGroupTP().getNomGroupTP().equals(groupeSelectionne)) {
+                    appartientAuGroupeSelectionne = true;
+                }
+            }
+
+            if (appartientAuGroupeSelectionne) {
+                somme += etu.GetMoyenneGenerale();
+                cpt++;
+            }
+        }
+
+        if (cpt > 0) {
+            float resultat = somme / cpt;
+            lblMoyGroup.setText(String.format("%.2f", resultat)); 
+        } else {
+            lblMoyGroup.setText("0.00");
+        }
+    }
+    
+    private void appliquerFiltre() {
+        String promoFiltre = comboPromo.getValue();
+        String groupeFiltre = comboGroupe.getValue();
+
+        // On filtre sur la liste qui contient DÉJÀ seulement les étudiants du prof
+        ObservableList<Etudiant> listeFiltree = listEtuAffichee.filtered(e -> {
+            
+            // 1. Filtre Promo
+            boolean matchesPromo = true;
+            if (promoFiltre != null && !promoFiltre.isEmpty()) {
+                matchesPromo = (e.getPromotion() != null && 
+                                e.getPromotion().getNomPromo().equals(promoFiltre));
+            }
+
+            // 2. Filtre Groupe (TD ou TP)
+            boolean matchesGroupe = true;
+            if (groupeFiltre != null && !groupeFiltre.isEmpty()) {
+                boolean isTD = e.getGroup().issetGroupTD() && 
+                               e.getGroup().getGroupTD().getNomGroupTD().equals(groupeFiltre);
+                boolean isTP = e.getGroup().issetGroupTP() && 
+                               e.getGroup().getGroupTP().getNomGroupTP().equals(groupeFiltre);
+                matchesGroupe = isTD || isTP;
+            }
+
+            return matchesPromo && matchesGroupe;
+        });
+
+        tableEtudiants.setItems(listeFiltree);
+    }
+
+    @FXML
+    private void reinitialiserFiltres() {
+        comboPromo.setValue(null);
+        comboGroupe.setValue(null);
+        tableEtudiants.setItems(listEtuAffichee); // Remet tous les étudiants du prof
+        lblMoyGroup.setText("0.00");
+    }
+}

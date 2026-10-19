@@ -1,0 +1,246 @@
+package controleurs;
+
+import Base.*;
+import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+public class GestionEnseignantController {
+
+    @FXML private TableView<Enseignant> tableEnseignants;
+    @FXML private TableColumn<Enseignant, String> colNom, colPrenom, colGenre, colMatiere, colRole;
+    @FXML private NavBarController navBarController;
+
+    @FXML
+    public void initialize() {
+        colNom.setCellValueFactory(new PropertyValueFactory<>("nom")); 
+        colPrenom.setCellValueFactory(new PropertyValueFactory<>("prenom"));
+        colGenre.setCellValueFactory(new PropertyValueFactory<>("genreEnsei"));
+        colRole.setCellValueFactory(new PropertyValueFactory<>("role"));
+        
+        colMatiere.setCellFactory(column -> new TableCell<Enseignant, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setText(null);
+                } else {
+                    Enseignant ens = getTableRow().getItem();
+                    setText(String.join(", ", ens.getToutesLesMatieres()));
+                }
+            }
+        });
+
+        tableEnseignants.setItems(FXCollections.observableArrayList(Enseignant.ListEnseignant));
+        if(navBarController != null) navBarController.updateNav(5); 
+    }
+
+    @FXML
+    private void handleAjouterEnseignant() {
+        // 1. Création de la boîte de dialogue
+        Dialog<Enseignant> dialog = new Dialog<>();
+        dialog.setTitle("Ajouter un nouvel enseignant");
+        dialog.setHeaderText("Veuillez saisir les informations de l'enseignant");
+
+        // 2. Configuration des boutons (Ajouter et Annuler)
+        ButtonType loginButtonType = new ButtonType("Ajouter", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+        // 3. Création du formulaire (GridPane)
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField nom = new TextField(); nom.setPromptText("Nom");
+        TextField prenom = new TextField(); prenom.setPromptText("Prénom");
+        
+        ComboBox<String> genre = new ComboBox<>(FXCollections.observableArrayList("M", "F", "Autre"));
+        genre.setValue("M");
+
+        TextField adresse = new TextField(); adresse.setPromptText("Adresse");
+        TextField mailPerso = new TextField(); mailPerso.setPromptText("Email Personnel");
+        TextField mailPro = new TextField(); mailPro.setPromptText("Email Professionnel");
+
+        ComboBox<String> role = new ComboBox<>(FXCollections.observableArrayList(
+            "ENSEIGNANT", "RESPONSABLE D’ANNÉE", "RESPONSABLE SEMESTRE", 
+            "RESPONSABLE DE FORMATION", "RESPONSABLE DE FILIÈRE"
+        ));
+        role.setValue("ENSEIGNANT");
+
+        // Ajout des composants au Grid
+        grid.add(new Label("Nom :"), 0, 0); grid.add(nom, 1, 0);
+        grid.add(new Label("Prénom :"), 0, 1); grid.add(prenom, 1, 1);
+        grid.add(new Label("Genre :"), 0, 2); grid.add(genre, 1, 2);
+        grid.add(new Label("Adresse :"), 0, 3); grid.add(adresse, 1, 3);
+        grid.add(new Label("Mail Perso :"), 0, 4); grid.add(mailPerso, 1, 4);
+        grid.add(new Label("Mail Pro :"), 0, 5); grid.add(mailPro, 1, 5);
+        grid.add(new Label("Rôle :"), 0, 6); grid.add(role, 1, 6);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // 4. Conversion du résultat quand on clique sur "Ajouter"
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == loginButtonType) {
+                // On utilise le constructeur de la classe Enseignant
+                return new Enseignant(
+                    Enseignant.ListEnseignant.size() + 1,
+                    nom.getText(),
+                    prenom.getText(),
+                    genre.getValue(),
+                    mailPro.getText(),
+                    mailPerso.getText(),
+                    adresse.getText(),
+                    role.getValue()
+                );
+            }
+            return null;
+        });
+
+        // 5. Affichage et mise à jour de la table
+        Optional<Enseignant> result = dialog.showAndWait();
+        result.ifPresent(enseignant -> {
+            // L'enseignant est déjà ajouté à ListEnseignant par son constructeur
+            tableEnseignants.setItems(FXCollections.observableArrayList(Enseignant.ListEnseignant));
+            tableEnseignants.refresh();
+        });
+    }
+
+    @FXML
+    private void handleModifierRole() {
+        Enseignant selectionne = tableEnseignants.getSelectionModel().getSelectedItem();
+        if (selectionne == null) {
+            afficherAlerte("Aucune sélection", "Veuillez sélectionner un enseignant à modifier.");
+            return;
+        }
+
+        // Liste des rôles autorisés (basée sur ton constructeur dans Enseignant.java)
+        List<String> choix = Arrays.asList(
+            "ENSEIGNANT", 
+            "RESPONSABLE D’ANNÉE", 
+            "RESPONSABLE SEMESTRE", 
+            "RESPONSABLE DE FORMATION",
+            "RESPONSABLE DE FILIÈRE"
+        );
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(selectionne.getRole(), choix);
+        dialog.setTitle("Modifier le rôle");
+        dialog.setHeaderText("Modification pour " + selectionne.getNomComplet());
+        dialog.setContentText("Nouveau rôle :");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(nouveauRole -> {
+            // ACTION : On modifie le rôle directement sur l'objet sélectionné
+            selectionne.setrole(nouveauRole);
+            
+            // On rafraîchit la table pour voir le changement immédiatement
+            tableEnseignants.refresh();
+        });
+    }
+
+    @FXML
+    private void handleSupprimerEnseignant() {
+        Enseignant selectionne = tableEnseignants.getSelectionModel().getSelectedItem();
+        if (selectionne == null) {
+            afficherAlerte("Aucune sélection", "Veuillez sélectionner un enseignant à supprimer.");
+            return;
+        }
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation de suppression");
+        alert.setHeaderText("Supprimer " + selectionne.getNomComplet() + " ?");
+        alert.setContentText("Cette action est irréversible.");
+
+        if (alert.showAndWait().get() == ButtonType.OK) {
+            Enseignant.ListEnseignant.remove(selectionne);
+            tableEnseignants.getItems().remove(selectionne);
+        }
+    }
+
+    private void afficherAlerte(String titre, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(titre);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+    
+    @FXML
+    private void handleAjouterCours() {
+        Enseignant selectionne = tableEnseignants.getSelectionModel().getSelectedItem();
+        if (selectionne == null) {
+            afficherAlerte("Aucune sélection", "Veuillez sélectionner un enseignant pour lui affecter un cours.");
+            return;
+        }
+
+        // 1. Création du dialogue
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Affecter un cours");
+        dialog.setHeaderText("Affecter un cours à : " + selectionne.getNomComplet());
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        // 2. Création des composants
+        GridPane grid = new GridPane();
+        grid.setHgap(10); grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        ComboBox<Promotion> comboPromo = new ComboBox<>(FXCollections.observableArrayList(Promotion.ListPromo));
+        ComboBox<IGroup> comboGroup = new ComboBox<>();
+        // On ne propose que les matières que l'enseignant possède déjà
+        ComboBox<String> comboMatiere = new ComboBox<>(FXCollections.observableArrayList(selectionne.getToutesLesMatieres()));
+
+        // Logique de mise à jour des groupes selon la promo sélectionnée
+        comboPromo.setOnAction(e -> {
+            Promotion p = comboPromo.getValue();
+            if (p != null) {
+                // Ici on filtre les groupes associés à la promo (via votre logique Group.ListGroup2)
+                ObservableList<IGroup> groupesDeLaPromo = FXCollections.observableArrayList();
+                for (Group link : Group.ListGroup2) {
+                    if (link.getPromo().equals(p)) {
+                        if (link.issetGroupTD()) groupesDeLaPromo.add(link.getGroupTD());
+                        if (link.issetGroupTP()) groupesDeLaPromo.add(link.getGroupTP());
+                    }
+                }
+                comboGroup.setItems(groupesDeLaPromo);
+            }
+        });
+
+        grid.add(new Label("Promotion :"), 0, 0); grid.add(comboPromo, 1, 0);
+        grid.add(new Label("Groupe (TD/TP) :"), 0, 1); grid.add(comboGroup, 1, 1);
+        grid.add(new Label("Matière :"), 0, 2); grid.add(comboMatiere, 1, 2);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // 3. Traitement du résultat
+        dialog.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                Promotion p = comboPromo.getValue();
+                IGroup g = comboGroup.getValue();
+                String m = comboMatiere.getValue();
+
+                if (p != null && g != null && m != null) {
+                    // ACTION : Créer le lien ici. 
+                    // Exemple : selectionne.ajouterCours(new Cours(p, g, m));
+                    
+                    // Si vous avez une liste globale de cours :
+                    // Cours.ListCours.add(new Cours(selectionne, p, g, m));
+                    
+                    System.out.println("Cours affecté : " + m + " pour le groupe " + g + " (" + p.getNomPromo() + ")");
+                    
+                    Alert success = new Alert(Alert.AlertType.INFORMATION, "Le cours a été affecté avec succès.");
+                    success.show();
+                } else {
+                    afficherAlerte("Champs incomplets", "Veuillez remplir tous les champs.");
+                }
+            }
+        });
+    }
+    
+}

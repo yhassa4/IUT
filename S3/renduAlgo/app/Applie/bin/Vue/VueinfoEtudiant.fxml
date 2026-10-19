@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<VBox spacing="0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="controleurs.infoEtudiantController" style="-fx-background-color: #fcfcfc;">
+    
+    <fx:include fx:id="navBar" source="NavBar.fxml" />
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" 
+                style="-fx-background-color: transparent; -fx-background: #fcfcfc; -fx-border-color: transparent;">
+        
+        <stylesheets>
+            <URL value="@style_scrollbar.css" /> 
+        </stylesheets>
+
+        <content>
+            <VBox spacing="20" style="-fx-padding: 25;">
+                
+                <Label text="Mes infos personnelles" 
+                       style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0c0d16;" />
+
+                <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-border-color: #dddddd; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);">
+                    <Label text="Identité" style="-fx-font-weight: bold; -fx-text-fill: #a50044; -fx-font-size: 14px;"/>
+                    <GridPane hgap="40" vgap="12">
+                        <Label text="N° Étudiant :" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #666666;"/>
+                        <Label fx:id="numEtuLabel" text="..." GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                        
+                        <Label text="Nom :" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #666666;"/>
+                        <Label fx:id="nomEtuLabel" text="..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        
+                        <Label text="Prénom :" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-text-fill: #666666;"/>
+                        <Label fx:id="prenomEtuLabel" text="..." GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                        <Label text="Genre :" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-text-fill: #666666;"/>
+                        <Label fx:id="genreEtuLabel" text="..." GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                    </GridPane>
+                </VBox>
+
+                <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-border-color: #dddddd; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);">
+                    <Label text="Contact" style="-fx-font-weight: bold; -fx-text-fill: #a50044; -fx-font-size: 14px;"/>
+                    <GridPane hgap="40" vgap="12">
+                        <Label text="Email Pro :" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #666666;"/>
+                        <Label fx:id="mailProEtuLabel" text="..." GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                        
+                        <Label text="Email Perso :" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #666666;"/>
+                        <Label fx:id="mailPersoEtuLabel" text="..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        
+                        <Label text="Adresse :" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-text-fill: #666666;"/>
+                        <Label fx:id="addrEtuLabel" text="..." GridPane.columnIndex="1" GridPane.rowIndex="2" wrapText="true"/>
+                    </GridPane>
+                </VBox>
+
+                <HBox spacing="20" minHeight="200">
+					<VBox fx:id="sondageContainer" HBox.hgrow="ALWAYS" spacing="10" 
+					      style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-border-color: #dddddd; -fx-border-radius: 8; -fx-background-radius: 8; -fx-border-style: dashed;">
+					    <Label text="Sondage" style="-fx-font-weight: bold; -fx-text-fill: #a50044;" />
+					    <Label fx:id="sondageStatusLabel" text="Aucun sondage en cours." style="-fx-italic: true; -fx-text-fill: #bbbbbb;" />
+					</VBox>
+
+                    <VBox HBox.hgrow="ALWAYS" spacing="10" 
+                          style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-border-color: #dddddd; -fx-border-radius: 8; -fx-background-radius: 8; -fx-border-style: dashed;">
+                        <Label text="Infos complémentaires" style="-fx-font-weight: bold; -fx-text-fill: #999999;" />
+                        <Label text="Notifications de scolarité..." style="-fx-italic: true; -fx-text-fill: #bbbbbb;" />
+                    </VBox>
+                </HBox>
+
+            </VBox>
+        </content>
+    </ScrollPane>
+</VBox>

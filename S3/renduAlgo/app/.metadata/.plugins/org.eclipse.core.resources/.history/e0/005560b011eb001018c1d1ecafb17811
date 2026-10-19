@@ -1,0 +1,32 @@
+package controleurs;
+
+import Appli.main;
+import Base.Etudiant;
+import Base.User;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+
+public class infoEtudiantController {
+
+    @FXML private Label numEtuLabel;
+    @FXML private Label nomEtuLabel;
+    @FXML private Label prenomEtuLabel;
+    @FXML private Label genreEtuLabel;
+    @FXML private Label mailProEtuLabel;
+    @FXML private Label mailPersoEtuLabel;
+    @FXML private Label addrEtuLabel;
+    @FXML private NavBarController navBarController;
+
+    @FXML
+    public void initialize() {
+    	Etudiant cUser = (Etudiant)main.getCurrentUser();
+        numEtuLabel.setText(cUser.getnum()+"");
+        nomEtuLabel.setText(cUser.getNomEtu());
+        prenomEtuLabel.setText(cUser.getPrenomEtu());
+        genreEtuLabel.setText(cUser.getGenreEtu());
+        mailProEtuLabel.setText(cUser.getmailpro());
+        mailPersoEtuLabel.setText(cUser.getmailperso());
+        addrEtuLabel.setText(cUser.getaddr());
+        navBarController.updateNav(0);
+    }
+}

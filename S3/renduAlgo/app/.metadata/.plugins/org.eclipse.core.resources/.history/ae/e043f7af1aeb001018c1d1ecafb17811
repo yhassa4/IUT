@@ -1,0 +1,145 @@
+package controleurs;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import java.util.ArrayList;
+import Appli.main;
+import Base.Etudiant;
+
+public class GroupesController {
+
+    @FXML private TableView<Etudiant> tableEtudiant;
+    @FXML private TableColumn<Etudiant, String> colNom;
+    @FXML private TableColumn<Etudiant, String> colPrenom;
+    @FXML private TableColumn<Etudiant, String> colGenre;
+    @FXML private TableColumn<Etudiant, String> colBac;
+    @FXML private TableColumn<Etudiant, String> colMail;
+    @FXML private TableColumn<Etudiant, String> colGroupe;
+    
+    @FXML private ComboBox<String> groupeCombo;
+    @FXML private Label lblCompteur;
+    @FXML private NavBarController navBarController;
+
+    private ObservableList<Etudiant> tousLesEtudiants = FXCollections.observableArrayList();
+    
+    @FXML
+    public void initialize() {    
+        
+        // Remplissage du ComboBox 
+        Etudiant cUser = (Etudiant)main.getCurrentUser(); // cUser = current user
+        ArrayList<String> options = new ArrayList<>();
+        
+
+        //recup les group de cUser
+        if(cUser != null && cUser.getGroup() != null) {
+            if(cUser.getGroup().issetGroupTD()){
+                String nomTD = cUser.getGroup().getGroupTD().getNomGroupTD();
+                if(!options.contains(nomTD)) options.add(nomTD);
+            }
+            if(cUser.getGroup().issetGroupTP()){
+                String nomTP = cUser.getGroup().getGroupTP().getNomGroupTP();
+                if(!options.contains(nomTP)) options.add(nomTP);
+            }
+        }
+        
+        groupeCombo.getItems().setAll(options);
+        
+        if (options.isEmpty()) {
+            groupeCombo.setPromptText("Aucun groupe assigné");
+        } else {
+            groupeCombo.setValue(options.get(0)); // Sélectionne le premier groupe 
+        }
+        
+        colNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
+        colPrenom.setCellValueFactory(new PropertyValueFactory<>("prenom"));
+        colGenre.setCellValueFactory(new PropertyValueFactory<>("genreEtu"));
+        colMail.setCellValueFactory(new PropertyValueFactory<>("mailProEtu"));
+        
+        colBac.setCellValueFactory(cellData -> { //recup bac 
+            if (cellData.getValue() != null && cellData.getValue().getBac() != null) {
+                return new SimpleStringProperty(cellData.getValue().getBac().getNomBac());
+            }
+            return new SimpleStringProperty("-");
+        });
+
+        colGroupe.setCellValueFactory(cellData -> {//recup les groups
+            Etudiant etu = cellData.getValue();
+            String selection = groupeCombo.getValue();
+            
+            if (etu == null || etu.getGroup() == null || selection == null) {
+                return new SimpleStringProperty("-");
+            }
+
+            // Si le nom selectionne correspond au TD
+            if (etu.getGroup().issetGroupTD() && selection.equals(etu.getGroup().getGroupTD().getNomGroupTD())) {
+                return new SimpleStringProperty(etu.getGroup().getGroupTD().getNomGroupTD());
+            } 
+            // Si le nom selectionne correspond au TP
+            if (etu.getGroup().issetGroupTP() && selection.equals(etu.getGroup().getGroupTP().getNomGroupTP())) {
+                return new SimpleStringProperty(etu.getGroup().getGroupTP().getNomGroupTP());
+            }
+
+            return new SimpleStringProperty("-");
+        });
+
+        chargerDonnees();
+        //bind  
+        groupeCombo.setOnAction(e -> {
+            appliquerFiltre();
+            tableEtudiant.refresh(); 
+        });
+        
+        if (!options.isEmpty()) {
+            appliquerFiltre();
+        }
+        
+       navBarController.updateNav(2);
+    }
+
+    
+    private void chargerDonnees() {
+        tousLesEtudiants.clear();
+        if (Etudiant.ListEtu != null) {
+            for (int i = 0; i < Etudiant.ListEtu.length(); i++) {
+                Etudiant e = Etudiant.ListEtu.get(i);
+                if (e != null) {
+                    tousLesEtudiants.add(e);
+                }
+            }
+        }
+    }
+
+    //fonction de filtrage
+    private void appliquerFiltre() {
+        String selection = groupeCombo.getValue();
+        
+        if (selection == null || selection.isEmpty()) {
+            tableEtudiant.setItems(FXCollections.observableArrayList());
+            lblCompteur.setText("Aucun groupe sélectionné");
+            return;
+        }
+        
+        ObservableList<Etudiant> filtres = FXCollections.observableArrayList();
+
+        for (Etudiant e : tousLesEtudiants) {
+            if (e == null || e.getGroup() == null) continue;
+
+            boolean matchTD = e.getGroup().issetGroupTD() && 
+                              e.getGroup().getGroupTD().getNomGroupTD().equals(selection);
+                              
+            boolean matchTP = e.getGroup().issetGroupTP() && 
+                              e.getGroup().getGroupTP().getNomGroupTP().equals(selection);
+            
+            if (matchTD || matchTP) {
+                filtres.add(e);
+            }
+        }
+        
+        tableEtudiant.setItems(filtres);
+        lblCompteur.setText("Nombre d'étudiants : " + filtres.size());
+    }
+}

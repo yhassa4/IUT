@@ -1,0 +1,38 @@
+package controleurs;
+
+import javafx.scene.control.ListCell;
+
+public class QuestionCell extends ListCell<String> {
+
+    // Cette méthode est appelée automatiquement pour chaque ligne de la liste
+    @Override
+    protected void updateItem(String item, boolean empty) {
+        super.updateItem(item, empty);
+
+        // Si la cellule est vide ou n'a pas de texte, on efface l'affichage
+        if (empty || item == null) {
+            setText(null);
+            setGraphic(null);
+        } else {
+            // 1. On découpe la chaîne de caractères en utilisant le séparateur "|"
+            // On utilise \\| car le symbole pipe est un caractère spécial en programmation
+            String[] partie = item.split("\\|");
+            
+            String intitule = partie[0]; // La première partie est la question elle-même
+            String texteFinal;
+
+            // 2. Vérification du type de question
+            if (partie.length > 1) {
+                // Si une deuxième partie existe, c'est un QCM (choix séparés par ";")
+                int nbChoix = partie[1].split(";").length;
+                texteFinal = intitule + " [QCM - " + nbChoix + " choix]";
+            } else {
+                // S'il n'y a qu'une partie, c'est une question à réponse libre
+                texteFinal = intitule + " [Réponse Libre]";
+            }
+
+            // 3. On définit le texte qui sera réellement affiché dans la cellule du menu
+            setText(texteFinal);
+        }
+    }
+}

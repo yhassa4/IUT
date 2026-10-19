@@ -1,0 +1,20 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+form {
+    border: #000000 solid 2px;
+    padding: 40px;
+    box-shadow: 2px 2px 10px #000000;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}

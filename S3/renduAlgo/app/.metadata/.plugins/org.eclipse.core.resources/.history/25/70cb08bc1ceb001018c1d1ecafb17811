@@ -1,0 +1,156 @@
+package controleurs;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.chart.*;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import Base.*;
+
+
+import java.util.ArrayList;
+import java.util.Date;
+
+public class ResponsableController {
+
+    @FXML private Label lblTotalEtudiants, lblSondagesCours, lblGroupesNonPublies, lblGroupesPublies;
+    @FXML private TableView<Sondage> tableSondages;
+    @FXML private TableColumn<Sondage, String> colNomSondage, colPromo, colParticipation,colDateFin;
+    @FXML private PieChart chartPromos;
+    @FXML private PieChart chartRedoublants, chartAlternants, chartParcours;
+    @FXML private ComboBox<Promotion> comboPromoFilter;
+    @FXML private NavBarController navBarController;
+
+
+    @FXML
+    public void initialize() {
+        configurerTableau();
+        
+        
+        comboPromoFilter.setItems(FXCollections.observableArrayList(Promotion.ListPromo));
+        comboPromoFilter.setOnAction(event -> remplirGraphiques());
+        
+     
+		navBarController.updateNav(0);
+        actualiserDonnees();
+    }
+    @FXML
+    private void resetFiltre() {
+        comboPromoFilter.setValue(null); // Remet à "Toutes les promos"
+        remplirGraphiques();
+    }
+
+    private void configurerTableau() {
+        colNomSondage.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getNomSondage()));
+        colPromo.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPromo().getNomPromo()));
+        
+        // Calcul du taux de participation
+        colParticipation.setCellValueFactory(data -> {
+            Sondage s = data.getValue();
+            double taux = calculerTaux(s);
+            return new SimpleStringProperty(String.format("%.1f%%", taux));
+        });
+        
+        colDateFin.setCellValueFactory(data -> {
+            Sondage s = data.getValue();
+            Date dateFin = (Date)s.getdateFin();
+            if(s.estTerminer()) {return new SimpleStringProperty("Terminer");}
+            return new SimpleStringProperty(dateFin.toString());
+        });
+        
+        
+    }
+
+    private double calculerTaux(Sondage s) {
+        int totalEtuPromo = 0;
+        for (int i = 0; i < Etudiant.ListEtu.length()-1; i++) {
+            Etudiant e = Etudiant.ListEtu.get(i);
+            if (e.getPromotion().equals(s.getPromo())) {
+                totalEtuPromo++;
+            }
+        }
+
+        if (totalEtuPromo == 0) return 0.0;
+
+        // Compter les étudiants ayant répondu
+        ArrayList<Etudiant> etudiantsAyantRepondu = new ArrayList<>();
+        for (Repond r : Repond.ListRepond) {
+            if (r.getSondage().equals(s)) {
+                Etudiant e = r.getEtudiant();
+                if (!etudiantsAyantRepondu.contains(e)) {
+                    etudiantsAyantRepondu.add(e);
+                }
+            }
+        }
+
+        return (double) etudiantsAyantRepondu.size() / totalEtuPromo * 100;
+    }
+
+    private void actualiserDonnees() {
+        lblTotalEtudiants.setText(String.valueOf(Etudiant.ListEtu.length()));
+
+        int actifs = 0;
+        for (Sondage s : Sondage.Sondages) {
+            if (s.estEnCours()) {
+                actifs++;
+            }
+        }
+        lblSondagesCours.setText(String.valueOf(actifs));
+        int cpt = 0 ;
+        for(IGroup g :Group.GroupList) {
+        	if(g.isActif()) {cpt++;}
+        }
+        		
+        		
+        lblGroupesNonPublies.setText(String.valueOf(Group.GroupList.size() - cpt));
+        
+        lblGroupesPublies.setText(String.valueOf(cpt));
+		tableSondages.setItems(FXCollections.observableArrayList(Sondage.Sondages));
+		remplirGraphiques();
+       
+        tableSondages.refresh();
+    }
+    
+    private void remplirGraphiques() {
+        int redoublants = 0, nonRedoublants = 0;
+        int alternants = 0, classiques = 0;
+        java.util.Map<String, Integer> compteParcours = new java.util.HashMap<>();
+
+        // On récupère la promotion sélectionnée
+        Promotion promoSelectionnee = comboPromoFilter.getValue();
+
+        for (int i = 0; i < Etudiant.ListEtu.length()-1; i++) {
+            Etudiant e = Etudiant.ListEtu.get(i);
+
+            if (promoSelectionnee == null || e.getPromotion().equals(promoSelectionnee)) {
+                
+                
+                if (e.estRedoublant()) redoublants++; else nonRedoublants++;
+
+                if (e.getApprentissage()) alternants++; else classiques++;
+
+                String nomParcours = e.getParcour().getNomParcour();
+                compteParcours.put(nomParcours, compteParcours.getOrDefault(nomParcours, 0) + 1); 
+            }
+        }
+
+        // Mise à jour des PieCharts
+        
+        chartRedoublants.setData(FXCollections.observableArrayList(
+            new PieChart.Data("Redoublants", redoublants),
+            new PieChart.Data("Non Redoublants", nonRedoublants)
+        ));
+
+        chartAlternants.setData(FXCollections.observableArrayList(
+            new PieChart.Data("Alternants", alternants),
+            new PieChart.Data("Initiaux", classiques)
+        ));
+
+        ObservableList<PieChart.Data> parcourspi = FXCollections.observableArrayList();
+        for (var entry : compteParcours.entrySet()) {
+        	parcourspi.add(new PieChart.Data(entry.getKey(), entry.getValue()));
+        }
+        chartParcours.setData(parcourspi);
+    }
+}

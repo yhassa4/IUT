@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        body { 
+            background: #111; 
+            color: white; 
+            text-align: center; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Empêche le défilement accidentel */
+            user-select: none; /* Empêche la sélection de texte */
+            -webkit-user-select: none;
+        }
+
+        #status { padding: 15px; font-weight: bold; background: #222; margin-bottom: 20px; }
+
+        .controls-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Deux colonnes principales */
+            grid-template-rows: auto auto; 
+            gap: 15px;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Les flèches de direction */
+        .movement-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            grid-column: 1 / 3; /* Prend toute la largeur en haut */
+        }
+
+        /* Le bouton SAUTER en dessous, plus large */
+        .jump-btn-container {
+            grid-column: 1 / 3;
+        }
+
+        button { 
+            height: 120px; 
+            width: 100%;
+            font-size: 24px; 
+            font-weight: bold;
+            background: #333; 
+            color: white; 
+            border: 2px solid #555; 
+            border-radius: 15px; 
+            outline: none;
+            touch-action: manipulation; /* Optimise le tactile */
+            transition: transform 0.05s, background 0.1s;
+            -webkit-tap-highlight-color: transparent; /* Retire le rectangle bleu sur Android/iOS */
+        }
+
+        /* Effet visuel quand on appuie */
+        button:active { 
+            background: #007bff; /* Bleu quand on appuie */
+            border-color: #00c3ff;
+            transform: scale(0.96); 
+        }
+
+        .jump-btn {
+            background: #444;
+            height: 100px;
+            border-color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div id="status">Connexion...</div>
+
+    <div class="controls-container">
+        <div class="movement-btns">
+			<button onpointerdown="send('GAUCHE')" onpointerup="send('STOP')">◀ GAUCHE</button>
+			<button onpointerdown="send('DROITE')" onpointerup="send('STOP')">DROITE ▶</button>
+		</div>
+
+		<div class="jump-btn-container">
+			<button class="jump-btn" onpointerdown="send('SAUTER')" onpointerup="send('RELACHE_SAUT')">⬆ SAUTER</button>
+		</div>
+    </div>
+
+    <script>
+        const socket = new WebSocket('wss://lizzie-guardable-chanelle.ngrok-free.dev');
+        
+        socket.onopen = () => document.getElementById('status').innerText = "CONNECTÉ ✅";
+        socket.onclose = () => document.getElementById('status').innerText = "DÉCONNECTÉ ❌";
+        
+        function send(msg) {
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(msg);
+                // Optionnel : petit feedback haptique (vibration) si supporté
+                if (navigator.vibrate) navigator.vibrate(10);
+            }
+        }
+
+        // Empêche le menu contextuel (clic droit) sur les boutons pour mobile
+        window.oncontextmenu = function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        };
+    </script>
+</body>
+</html>

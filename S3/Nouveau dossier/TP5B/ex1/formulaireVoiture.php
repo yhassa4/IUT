@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire Voiture</title>
+</head>
+<body>
+    <?php 
+        include("menu.html");
+    ?>
+
+    <h2>Formulaire Voiture</h2>
+    <form action="creerVoiture.php" method="get">
+        <label for="immatriculation">Immatriculation</label>
+        <input type="text" name="immatriculation" id="immatriculation" maxlength="8" size="8" required><br>
+        <label for="marque">Marque</label>
+        <input type="text" name="marque" id="marque" required><br>
+        <label for="couleur">Couleur</label>
+        <input type="text" name="couleur" id="couleur" required><br>
+        <input type="submit" value="Envoyer">
+    </form>
+</body>
+</html>

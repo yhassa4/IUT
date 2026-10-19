@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://dx70onhoy00yf"]
+
+[ext_resource type="Script" uid="uid://cuklandu0djcb" path="res://scripts/ExitDoor.gd" id="1_0gig8"]
+[ext_resource type="Texture2D" uid="uid://byal8ydx8p35a" path="res://assets/sprites/exit_door.png" id="1_spv3s"]
+[ext_resource type="Texture2D" uid="uid://cgwbn83jpxdqm" path="res://assets/sprites/dot_particle.png" id="2_i1lea"]
+[ext_resource type="Texture2D" uid="uid://cjj5gy8nbcbxq" path="res://assets/environment/pointLight.png" id="3_i1lea"]
+
+[sub_resource type="Curve" id="Curve_427ts"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.5103448, 0.7316911), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_rg8gv"]
+curve = SubResource("Curve_427ts")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_yjq4l"]
+particle_flag_disable_z = true
+emission_shape = 6
+emission_ring_axis = Vector3(0, 0, 1)
+emission_ring_height = 1.0
+emission_ring_radius = 1.0
+emission_ring_inner_radius = 0.0
+emission_ring_cone_angle = 90.0
+angle_min = 1.0728835e-05
+angle_max = 360.00003
+direction = Vector3(0, 0, 0)
+spread = 180.0
+initial_velocity_min = 100.0
+initial_velocity_max = 200.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.03
+scale_max = 0.03
+scale_curve = SubResource("CurveTexture_rg8gv")
+color = Color(0.5294118, 0.9647059, 0.7019608, 1)
+hue_variation_min = 0.049999975
+hue_variation_max = 0.049999975
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_i1lea"]
+size = Vector2(52, 76)
+
+[node name="Node2D" type="Area2D" unique_id=119761569]
+script = ExtResource("1_0gig8")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2029395925]
+texture = ExtResource("1_spv3s")
+offset = Vector2(2, -64)
+
+[node name="GPUParticles2D2" type="GPUParticles2D" parent="." unique_id=1974027611]
+position = Vector2(0, -35)
+scale = Vector2(0.5200003, 1)
+amount = 40
+texture = ExtResource("2_i1lea")
+lifetime = 0.8
+randomness = 0.5
+process_material = SubResource("ParticleProcessMaterial_yjq4l")
+
+[node name="PointLight2D" type="PointLight2D" parent="." unique_id=1605439012]
+position = Vector2(-1, -51)
+scale = Vector2(0.43169636, 0.5087043)
+color = Color(0.48171133, 0.75807405, 0.27773932, 1)
+energy = 2.0
+texture = ExtResource("3_i1lea")
+
+[node name="Label" type="Label" parent="." unique_id=2139427015]
+offset_left = -17.0
+offset_top = -101.0
+offset_right = 23.0
+offset_bottom = -78.0
+pivot_offset = Vector2(19, 12)
+text = "EXIT"
+
+[node name="PointLight2D" type="PointLight2D" parent="Label" unique_id=1772059312]
+position = Vector2(17.000002, 12)
+scale = Vector2(0.13272548, 0.117557675)
+color = Color(0.3764706, 0.7529412, 0.5803922, 1)
+energy = 5.0
+texture = ExtResource("3_i1lea")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=619450800]
+position = Vector2(-1, -38)
+shape = SubResource("RectangleShape2D_i1lea")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/25" 
+           fx:controller="controleurs.LoginController"
+           style="-fx-background-color: #f4f4f4;"> <VBox alignment="CENTER" spacing="20" 
+          maxWidth="400" maxHeight="350" 
+          style="-fx-background-color: WHITE; -fx-border-color: #CCCCCC; -fx-border-radius: 15; -fx-background-radius: 15; -fx-padding: 30;">
+        
+
+        <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Connexion" />
+        
+        <VBox spacing="5" alignment="CENTER_LEFT">
+            <Label text="Identifiant" />
+            <TextField fx:id="loginField" prefHeight="40" />
+        </VBox>
+        
+        <VBox spacing="5" alignment="CENTER_LEFT">
+            <Label text="Mot de passe" />
+            <PasswordField fx:id="passwordField" prefHeight="40" />
+        </VBox>
+        
+        <Button onAction="#handleLogin" text="Se connecter" 
+                style="-fx-background-color: #0c0d16; -fx-text-fill: white; -fx-font-weight: bold;" 
+                prefHeight="40" maxWidth="Infinity" />
+        
+        <Label fx:id="errorLabel" text="" textFill="red" />
+    </VBox>
+    
+</StackPane>

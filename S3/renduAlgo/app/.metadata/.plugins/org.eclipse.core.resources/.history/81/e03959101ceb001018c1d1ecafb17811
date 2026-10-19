@@ -1,0 +1,111 @@
+package controleurs;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
+import Appli.main;
+import Base.Etudiant;
+import Base.Note;
+
+public class NotesEtudiantController {
+
+    @FXML private TableView<Note> tableNotes;
+    @FXML private TableColumn<Note, String> colSemestre;
+    @FXML private TableColumn<Note, String> colMatiere;
+    @FXML private TableColumn<Note, Float> colNote;
+    @FXML private TableColumn<Note, Float> colNoteMax;
+    @FXML private ComboBox<String> semestreCombo;
+    @FXML private Label lblMoyenne;
+    @FXML private NavBarController navBarController;
+    Etudiant cUser = (Etudiant)main.getCurrentUser();
+
+    //ObservableList utiliser pour tableview , envoie un signal quand un de ses objets changes
+    private ObservableList<Note> toutesLesNotes = FXCollections.observableArrayList();
+
+    @FXML
+    public void initialize() {
+        colSemestre.setCellValueFactory(new PropertyValueFactory<>("SemestreNom")); //vas recup le getter
+        colMatiere.setCellValueFactory(new PropertyValueFactory<>("matiereNom"));
+        colNote.setCellValueFactory(new PropertyValueFactory<>("valeur"));
+        colNoteMax.setCellValueFactory(new PropertyValueFactory<>("valeurMax"));
+        
+        chargerDonnees();
+        //Remplir le combobox
+        ArrayList<String> nomSemestre = new ArrayList<String>();
+        nomSemestre.add("Tous");
+        for(int i = 0 ;i <toutesLesNotes.size();i++) {
+        	if(nomSemestre.contains(toutesLesNotes.get(i).getsemestre().getNomSemestre())) {
+        		
+        	}else {
+        		nomSemestre.add(toutesLesNotes.get(i).getsemestre().getNomSemestre());
+        	}
+        	
+        }
+
+        semestreCombo.getItems().setAll(nomSemestre);//setAll meilleur avec les arraylist que addAll
+        semestreCombo.setValue("Tous");//value par default
+
+        //bind du combobox
+        semestreCombo.setOnAction(e -> appliquerFiltre());
+        
+        appliquerFiltre();
+        navBarController.updateNav(1);
+    }
+
+    
+    private void chargerDonnees() {
+    	ArrayList<Note> note = Note.GetNotes(cUser);
+    	for(int i = 0 ;i < note.size();i++) {
+    		toutesLesNotes.add(note.get(i)); // .add d'un ObservableList actualise le tableau (modifier n'actualise pas)
+    	}
+    }
+
+    private void appliquerFiltre() {
+        String selection = semestreCombo.getValue();
+        
+        if (selection.equals("Tous")) {
+            tableNotes.setItems(toutesLesNotes);
+            calculerMoyenne(toutesLesNotes);
+            return;
+        }
+
+        
+        ObservableList<Note> notesFiltre = FXCollections.observableArrayList();
+
+     
+        for (Note n : toutesLesNotes) {
+            
+            String nomDuSemestre = n.getsemestre().getNomSemestre();
+
+            
+            if (nomDuSemestre.equals(selection)) {
+                notesFiltre.add(n); 
+            }
+        }
+
+        tableNotes.setItems(notesFiltre);
+        calculerMoyenne(notesFiltre);
+    }
+
+    private void calculerMoyenne(ObservableList<Note> notes) { // je suppose qu il ne peux pas exister de notemax = 0
+        if (notes.isEmpty()) {
+            lblMoyenne.setText("-- / 20");
+            return;
+        }
+        
+        float moyenne = 0;
+        for (Note n : notes) {
+            float note20 = (n.getvaleur() / n.getValeurMax()) * 20;
+            moyenne += note20;
+        }
+        
+        moyenne = moyenne / notes.size();
+        lblMoyenne.setText(String.format("%.2f / 20", moyenne));
+    }
+}

@@ -1,0 +1,191 @@
+package controleurs;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import java.util.HashSet;
+import java.util.Set;
+
+import Appli.main;
+
+import java.util.ArrayList;
+
+import Base.*;
+
+public class EnseignantController {
+
+    @FXML private Label lblTotalEtudiants, lblTotalGroupes, lblTotalPromos,lblMoyGroup;
+    @FXML private TableView<Etudiant> tableEtudiants;
+    @FXML private TableColumn<Etudiant, String> colNom, colPrenom, colMail, colGroupe, colMoyenne;
+    @FXML private ComboBox<String> comboPromo, comboGroupe;
+    @FXML private NavBarController navBarController;
+
+    // Liste des etudiant lier au enseignant
+    private ObservableList<Etudiant> ListEtu = FXCollections.observableArrayList();
+
+    @FXML
+    public void initialize() {
+        //Liaison 
+        colNom.setCellValueFactory(new PropertyValueFactory<>("nomEtu"));
+        colPrenom.setCellValueFactory(new PropertyValueFactory<>("prenomEtu"));
+        colMail.setCellValueFactory(new PropertyValueFactory<>("mailProEtu"));
+        
+        colGroupe.setCellValueFactory(cellData -> {
+            Etudiant e = cellData.getValue();
+            if (e == null || e.getGroup() == null) return new SimpleStringProperty("-");
+            Group g = e.getGroup();
+            String td = g.issetGroupTD() ? g.getGroupTD().getNomGroupTD() : "";
+            String tp = g.issetGroupTP() ? g.getGroupTP().getNomGroupTP() : "";
+            
+            if (!td.isEmpty() && !tp.isEmpty()) return new SimpleStringProperty(td + " / " + tp);
+            return new SimpleStringProperty(td.isEmpty() ? tp : td);
+        });
+
+        colMoyenne.setCellValueFactory(cellData -> {
+            float moy = cellData.getValue().GetMoyenneGenerale();
+            return new SimpleStringProperty(String.format("%.2f", moy));
+        });
+
+        chargerDonnees();
+
+        comboPromo.setOnAction(e -> appliquerFiltre());
+        comboGroupe.setOnAction(e -> {
+            appliquerFiltre();
+            reloadMoy();
+        });
+        Enseignant cUser = (Enseignant)main.getCurrentUser();
+        if(cUser.getRole() != "ENSEIGNANT") {
+        	navBarController.updateNav(2);
+        }
+        
+        
+    }
+
+    private void chargerDonnees() {
+        Set<String> nomsPromos = new HashSet<>();//set est = a un ensemble en maths , ici ca permet de ne pas faire la verif contain
+        Set<String> nomsGroupes = new HashSet<>();
+        ArrayList<Etudiant> listeTemporaire = new ArrayList<>();
+        Enseignant cUser = (Enseignant)main.getCurrentUser();
+        
+        for (int i = 0; i < Etudiant.ListEtu.length(); i++) {
+            Etudiant e = Etudiant.ListEtu.get(i);
+            if (e != null) {
+                
+
+                if (e.getPromotion() != null) {
+                    nomsPromos.add(e.getPromotion().getNomPromo().toString());
+                }
+
+                if (e.getGroup() != null ) {
+                    if (e.getGroup().issetGroupTD() && cUser.getGroup().contains(e.getGroup().getGroupTD())) {
+                    	listeTemporaire.add(e);
+                        nomsGroupes.add(e.getGroup().getGroupTD().getNomGroupTD().toString());
+                    }
+                    if (e.getGroup().issetGroupTP() && cUser.getGroup().contains(e.getGroup().getGroupTP())) {
+                    	listeTemporaire.add(e);
+                        nomsGroupes.add(e.getGroup().getGroupTP().getNomGroupTP().toString());
+                    }
+                }
+            }
+        }
+
+        ListEtu.setAll(listeTemporaire);
+        tableEtudiants.setItems(ListEtu);
+
+        comboPromo.setItems(FXCollections.observableArrayList(nomsPromos).sorted());
+        comboGroupe.setItems(FXCollections.observableArrayList(nomsGroupes).sorted());
+
+        lblTotalEtudiants.setText(String.valueOf(ListEtu.size()));
+        lblTotalGroupes.setText(String.valueOf(nomsGroupes.size()));
+        lblTotalPromos.setText(String.valueOf(nomsPromos.size()));
+        lblMoyGroup.setText(String.valueOf(0));
+        
+        
+    }
+    private void reloadMoy() {
+        String groupeFiltre = comboGroupe.getValue();
+        
+        if (groupeFiltre == null) {
+            lblMoyGroup.setText("0.00");
+            return;
+        }
+
+        float somme = 0;
+        int cpt = 0;
+
+        for (Etudiant etu : ListEtu) {
+            boolean estDansLeGroupe = false;
+            if (etu.getGroup() != null) {
+                if (etu.getGroup().issetGroupTD() && 
+                    etu.getGroup().getGroupTD().getNomGroupTD().equals(groupeFiltre)) {
+                    estDansLeGroupe = true;
+                }
+                if (etu.getGroup().issetGroupTP() && 
+                    etu.getGroup().getGroupTP().getNomGroupTP().equals(groupeFiltre)) {
+                    estDansLeGroupe = true;
+                }
+            }
+            if (estDansLeGroupe) {
+                somme += etu.GetMoyenneGenerale();
+                cpt++;
+            }
+        }
+        if (cpt > 0) {
+            float resultat = somme / cpt;
+            lblMoyGroup.setText(String.format("%.2f", resultat)); 
+        } else {
+            lblMoyGroup.setText("0.00");
+        }
+    }
+    
+    private void appliquerFiltre() {
+        String promoFiltre = comboPromo.getValue();
+        String groupeFiltre = comboGroupe.getValue();
+
+        ObservableList<Etudiant> Listetudiltrer = ListEtu.filtered(e -> {
+            // Filtre Promo
+            boolean matchesPromo = (promoFiltre == null || 
+                (e.getPromotion() != null && e.getPromotion().getNomPromo().toString().equals(promoFiltre)));
+
+            // Filtre Groupe 
+            boolean matchesGroupe = (groupeFiltre == null || 
+                (e.getGroup() != null && (
+                    (e.getGroup().issetGroupTD() && e.getGroup().getGroupTD().getNomGroupTD().toString().equals(groupeFiltre)) ||
+                    (e.getGroup().issetGroupTP() && e.getGroup().getGroupTP().getNomGroupTP().toString().equals(groupeFiltre))
+                )));
+
+            return matchesPromo && matchesGroupe;
+        });
+
+        tableEtudiants.setItems(Listetudiltrer);
+    }
+
+    @FXML
+    private void reinitialiserFiltres() {
+        comboPromo.setValue(null);
+        comboGroupe.setValue(null);
+        tableEtudiants.setItems(ListEtu);
+    }
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+}

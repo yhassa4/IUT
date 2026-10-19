@@ -1,0 +1,555 @@
+/* Fond de page gris clair */
+body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: #f5f5f5; }
+
+/* 1. La barre tout en haut (Logo Université) */
+.top-header {
+    background-color: #0c0c17; /* Bleu très foncé presque noir */
+    padding: 10px 40px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+}
+.logo-univ { color: #e91e63; font-weight: bold; font-size: 22px; letter-spacing: 1px; }
+.iut-text { color: #555; margin-left: 15px; border-left: 1px solid #555; padding-left: 15px; font-weight: bold; }
+
+/* 2. La barre de titre blanche */
+.title-bar {
+    background: white;
+    padding: 15px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.app-title { display: flex; align-items: center; font-size: 20px; font-weight: bold; color: #000; }
+.app-title i { margin-right: 15px; font-size: 28px; } /* Pour l'icône du chapeau */
+
+.user-nav { display: flex; align-items: center; gap: 20px; }
+.promo-badge { background: white; border: 1px solid #ddd; padding: 8px 20px; border-radius: 25px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.user-name { font-weight: bold; }
+.role-badge { background: #0c0c17; color: white; padding: 8px 25px; border-radius: 25px; font-size: 14px; text-decoration: none; }
+.logout-btn { border: 1px solid #000; padding: 8px 25px; border-radius: 25px; color: #000; font-weight: bold; text-decoration: none; }
+
+/* 3. Le menu des onglets gris */
+.menu-container { padding: 20px 40px; }
+.nav-pills {
+    background: #e8e8e8;
+    display: inline-flex;
+    padding: 5px;
+    border-radius: 30px;
+    gap: 5px;
+    width: 100%;
+}
+.nav-link {
+    text-decoration: none;
+    color: #000;
+    padding: 10px 30px;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+.nav-link.active { background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+/* 4. Contenu et Table */
+.content-body { padding: 0 40px; }
+.data-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
+.data-table th { background: #f8f8f8; padding: 15px; text-align: left; border-bottom: 2px solid #eee; }
+.data-table td { padding: 15px; border-bottom: 1px solid #eee; }
+
+
+.stats-grid {
+    display: flex;
+    justify-content: space-around;
+    gap: 25px;
+    padding: 20px 40px;
+}
+
+.stat-card-big {
+    background: white;
+    border: 1.5px solid #d1d1d1;
+    border-radius: 35px;
+    flex: 1;
+    padding: 40px 10px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.stat-card-big h3 { font-size: 1.1rem; margin-bottom: 10px; color: #333; }
+.stat-card-big .number { font-size: 70px; font-weight: bold; color: #000; }
+
+.sondage-preview {
+    background: white;
+    border: 1.5px solid #d1d1d1;
+    border-radius: 35px;
+    margin: 20px 40px;
+    padding: 25px;
+    width: 400px;
+}
+
+
+
+
+
+
+
+
+
+.teacher-table th {
+    text-align: left;
+    padding: 15px;
+    font-size: 1.1rem;
+    border-bottom: 3px solid #000; /* La ligne noire épaisse du haut */
+}
+
+.teacher-table td {
+    padding: 15px;
+    border-bottom: 2px solid #000; /* Lignes entre les profs */
+}
+
+.btn-add {
+    background: #0c0c17;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    float: right;
+}
+
+.main-management-grid {
+    display: flex;
+    gap: 20px;
+    padding: 20px 40px;
+}
+
+/* Panneau de création */
+.creation-panel {
+    flex: 2;
+    background: white;
+    border: 1px solid #000;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+/* Panneau de liste à droite */
+.list-panel {
+    flex: 1;
+    background: white;
+    border: 1px solid #000;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.list-header {
+    background: #f8f8f8;
+    padding: 10px;
+    font-weight: bold;
+    border-bottom: 1px solid #000;
+    text-align: center;
+}
+
+.group-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    border-bottom: 2px solid #000;
+    font-weight: bold;
+}
+
+/* Boutons colorés */
+.btn-publier { background: #ccc; border-radius: 10px; padding: 5px 20px; }
+.btn-annuler { background: #ff0000; color: white; border-radius: 10px; padding: 5px 20px; }
+.btn-valider { background: #ccc; width: 100%; margin-top: 20px; padding: 10px; border-radius: 10px; }
+
+
+
+.survey-flex {
+    display: flex;
+    gap: 30px;
+}
+
+.survey-left-col, .survey-right-col {
+    flex: 1;
+}
+
+.question-box {
+    border: 1.5px solid #000;
+    margin: 15px 0;
+    background: white;
+}
+
+.question-header {
+    background: #fff;
+    border-bottom: 1px solid #000;
+    padding: 5px 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.question-box textarea {
+    width: 100%;
+    height: 80px;
+    border: none;
+    padding: 10px;
+    resize: none;
+}
+
+.btn-cree {
+    background: #ccc;
+    border-radius: 15px;
+    padding: 5px 40px;
+    border: 1px solid #000;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.survey-list-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.survey-list-table th { border-bottom: 2px solid #000; padding: 10px; text-align: left; }
+.survey-list-table td { border-bottom: 1px solid #000; padding: 12px 10px; font-weight: bold; }
+
+/* Fond noir transparent */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+/* Boîte blanche centrale */
+/* Boîte blanche centrale corrigée */
+.modal-content {
+    background-color: #fff !important;
+    margin: 20px auto !important;
+    padding: 25px !important;
+    width: 450px !important;
+    border-radius: 20px !important;
+    position: relative !important;
+
+    /* Forcer le scroll vertical */
+    max-height: 80vh !important; /* 80% de la hauteur de l'écran */
+    overflow-y: auto !important; /* Active la barre de défilement */
+    display: block !important;
+}
+
+/* Optionnel : Améliorer le look de la barre de défilement */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+.modal-content::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+
+.close-btn {
+    position: absolute; right: 20px; top: 15px;
+    font-size: 28px; cursor: pointer;
+}
+
+.modal-form label {
+    display: block; font-weight: bold; margin-top: 15px;
+}
+
+.modal-form input, .modal-form select {
+    width: 100%; padding: 10px; margin-top: 5px;
+    border: 1px solid #ccc; border-radius: 12px;
+    background-color: #f3f3f3;
+}
+
+.btn-submit-modal {
+    display: block; width: 60%; margin: 30px auto 10px;
+    padding: 12px; border-radius: 15px; border: 1px solid #000;
+    background: #e9e9e9; font-weight: bold; cursor: pointer;
+    font-size: 18px;
+}
+
+/* Barre d'action spécifique aux étudiants */
+.action-bar-etudiant {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
+
+.filters-left {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.input-search {
+    border: 1px solid #000;
+    border-radius: 20px;
+    padding: 8px 15px;
+    width: 200px;
+    outline: none;
+}
+
+.btn-search {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+/* Style du bouton d'ajout bleu foncé comme sur l'image */
+.btn-add-etudiant {
+    background: #1a237e; /* Bleu marine */
+    color: white;
+    padding: 10px 25px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: lowercase; /* Pour "ajouter etudiant" */
+}
+
+
+
+/* 1. Conteneur principal pour les statistiques (Enseignant et Accueil) */
+.stats-grid-small, .stats-grid-enseignant {
+    display: flex;       /* Force l'alignement en ligne */
+    flex-direction: row;  /* Empêche l'empilement vertical */
+    justify-content: center;         /* Centre le groupe de cartes */
+    align-items: stretch;            /* Force les cartes à avoir la même hauteur */
+    gap: 25px;                       /* Espace régulier entre les cartes */
+    margin: 20px auto 40px auto;     /* Centre la grille dans la page */
+    padding: 0 40px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 2. Style unifié des cartes blanches */
+.stat-card-white {
+    background: white;
+    border: 1.5px solid #d1d1d1;    /* Bordure grise plus douce comme sur l'image */
+    border-radius: 35px;            /* Arrondi prononcé selon votre modèle */
+    padding: 30px 15px;
+    flex: 1;                        /* Chaque carte prend la même largeur */
+    max-width: 280px;               /* Évite que les cartes ne deviennent trop larges */
+    min-width: 200px;               /* Garantit une lisibilité minimale */
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* 3. Typographie à l'intérieur des cartes */
+.stat-card-white h3 {
+    font-size: 1rem;
+    color: #333;
+    margin: 0 0 15px 0;
+    font-weight: 600;
+}
+
+.stat-card-white .big-num {
+    font-size: 55px;                /* Taille optimale pour le chiffre */
+    font-weight: bold;
+    color: #000;
+    line-height: 1;
+    margin: 0;
+}
+
+/* --- AJUSTEMENT DES TABLES --- */
+.teacher-table {
+    width: calc(100% - 80px);       /* Aligné avec les marges des stats */
+    margin: 20px auto;
+    border-collapse: collapse;
+}
+
+
+.student-dashboard {
+    padding: 20px 40px;
+}
+
+.info-card {
+    background: white;
+    border: 1px solid #d1d1d1;
+    border-radius: 40px; /* Arrondi très prononcé comme sur l'image */
+    padding: 30px 40px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+
+.info-card h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.info-card p {
+    margin: 10px 0;
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+.info-card strong {
+    display: inline-block;
+    width: 80px; /* Alignement propre des labels */
+}
+
+/* --- Structure Générale --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+/* --- Cartes de Statistiques (Style Bulle) --- */
+.stats-grid {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    padding: 20px;
+}
+
+.stat-card-rounded {
+    background: white;
+    border: 1px solid #d1d1d1;
+    border-radius: 30px; /* Coins très arrondis */
+    padding: 25px;
+    width: 220px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.stat-card-rounded h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.stat-card-rounded .number {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: #000;
+    margin-top: 10px;
+}
+
+/* --- Tableau de Consultation --- */
+.data-section {
+    background: white;
+    margin: 20px;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.consultation-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.consultation-table thead {
+    border-bottom: 2px solid #000; /* Ligne épaisse sous l'entête */
+}
+
+.consultation-table th {
+    text-align: left;
+    padding: 12px;
+    font-weight: bold;
+}
+
+.consultation-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+/* --- Sélecteurs et Filtres --- */
+select {
+    border-radius: 20px;
+    padding: 8px 20px;
+    border: 1px solid #ccc;
+    background: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+/* --- Vue Étudiant (Profil) --- */
+.info-card {
+    background: white;
+    border: 1px solid #d1d1d1;
+    border-radius: 40px; /* Arrondi maximal pour le profil */
+    padding: 40px;
+    margin: 20px auto;
+    max-width: 90%;
+}
+
+.list-panel { width: 100% !important; flex: 1; }
+
+.teacher-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+}
+
+.teacher-table th {
+    background-color: #eeeeee;
+    color: #333;
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.teacher-table td {
+    padding: 8px 10px;
+    border: 1px solid #eee;
+}
+
+/* Effet une ligne sur deux grise comme sur ta capture */
+.teacher-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.teacher-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Container des groupes */
+.group-display-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Carte individuelle de groupe (TD ou TP) */
+.group-card {
+    padding: 20px;
+    background: #ffffff;
+    border-left: 6px solid #b30b44; /* Bordeaux IUT */
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+}
+
+.group-label {
+    display: block;
+    font-weight: bold;
+    color: #888;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.group-name {
+    font-size: 1.6rem;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.group-section-title {
+    color: #b30b44;
+    border-bottom: 2px solid #eeeeee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}

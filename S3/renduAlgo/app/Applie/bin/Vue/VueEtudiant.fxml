@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="controleurs.EtudiantController" style="-fx-background-color: #f4f7f6;">
+    
+<top>
+<HBox><fx:include fx:id="navBar" source="NavBar.fxml" /></HBox>
+    <VBox spacing="10" style="-fx-padding: 5; -fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-width: 0 0 1 0;">
+        <fx:include fx:id="navBar" source="NavBar.fxml" />
+        <HBox spacing="15" alignment="CENTER_LEFT">
+            <Label text="Filtrer par Promo :" style="-fx-font-weight: bold;"/>
+            <ComboBox fx:id="comboPromoFilter" prefWidth="200" promptText="Toutes les promotions" />
+            <Label text="Filtrer par group :" style="-fx-font-weight: bold;"/>
+            <ComboBox fx:id="combogroupFilter" prefWidth="200" promptText="Toutes les groups" />
+            
+            <Button text="🔄" onAction="#resetFilter">
+                <tooltip>
+                    <Tooltip text="Réinitialiser le filtre"/>
+                </tooltip>
+            </Button>
+            
+            <Separator orientation="VERTICAL" />
+            
+            <Button text="Modifier" onAction="#ModifierEtudiant" style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
+			<Button text="Notes" onAction="#ouvrirGestionNotes" style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
+            
+            <Separator orientation="VERTICAL" />
+            
+            <Button fx:id="buttonImport" text="📂 Importer Notes (.csv)" onAction="#importerNotes" style="-fx-background-color: #6f42c1; -fx-text-fill: white;"/>
+            <Button fx:id="buttonExport" text="💾 Exporter Données (.csv)" onAction="#exporterDonnees" style="-fx-background-color: #17a2b8; -fx-text-fill: white;"/>
+        </HBox>
+    </VBox>
+</top>
+
+    <center>
+        <TableView fx:id="tableEtudiants" style="-fx-padding: 10;">
+            <columns>
+                <TableColumn fx:id="colNum" text="N°" prefWidth="50"/>
+                <TableColumn fx:id="colNom" text="Nom" prefWidth="100"/>
+                <TableColumn fx:id="colPrenom" text="Prénom" prefWidth="100"/>
+                <TableColumn fx:id="colgenre" text="Genre" prefWidth="100"/>
+                <TableColumn fx:id="colPromo" text="Promotion" prefWidth="120"/>
+                <TableColumn fx:id="colAddr" text="Address" prefWidth="120"/>
+                <TableColumn fx:id="colMailperso" text="Email Perso" prefWidth="180"/>
+                <TableColumn fx:id="colMailpro" text="Email Pro" prefWidth="180"/>
+                <TableColumn fx:id="colBac" text="Email Pro" prefWidth="100"/>
+                <TableColumn fx:id="colParcour" text="Email Pro" prefWidth="100"/>
+                <TableColumn fx:id="colCursus" text="Email Pro" prefWidth="100"/>
+                <TableColumn fx:id="colMoyenne" text="Moyenne Gen." prefWidth="180"/>
+                <TableColumn fx:id="colgtp" text="GroupTP" prefWidth="180"/>
+                <TableColumn fx:id="colgtd" text="GroupTD." prefWidth="100"/>
+            </columns>
+            <placeholder>
+                <Label text="Aucun étudiant dans la liste" />
+            </placeholder>
+        </TableView>
+    </center>
+    
+    <bottom>
+        <HBox style="-fx-padding: 5;">
+            <Label fx:id="lblStatus" text="Prêt" style="-fx-text-fill: grey;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

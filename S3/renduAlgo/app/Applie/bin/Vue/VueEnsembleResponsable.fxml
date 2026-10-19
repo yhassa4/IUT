@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
+
+<VBox spacing="20" style="-fx-background-color: #f8f9fa;" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controleurs.ResponsableController">
+    <fx:include fx:id="navBar" source="NavBar.fxml" />
+    
+
+    <HBox spacing="15" alignment="CENTER">
+        <VBox styleClass="stat-card" prefWidth="200" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10; -fx-border-color: #dee2e6;">
+            <Label text="Étudiants" textFill="#6c757d"/>
+            <Label fx:id="lblTotalEtudiants" text="0" style="-fx-font-size: 24; -fx-font-weight: bold;"/>
+        </VBox>
+        <VBox styleClass="stat-card" prefWidth="200" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10; -fx-border-color: #dee2e6;">
+            <Label text="Sondages Actifs" textFill="#6c757d"/>
+            <Label fx:id="lblSondagesCours" text="0" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #007bff;"/>
+        </VBox>
+        <VBox styleClass="stat-card" prefWidth="200" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10; -fx-border-color: #dee2e6;">
+            <Label text="Groupes Non-Publiés" textFill="#6c757d"/>
+            <Label fx:id="lblGroupesNonPublies" text="0" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #dc3545;"/>
+        </VBox>
+        <VBox styleClass="stat-card" prefWidth="200" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10; -fx-border-color: #dee2e6;">
+            <Label text="Groupes Publiés" textFill="#6c757d"/>
+            <Label fx:id="lblGroupesPublies" text="0" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #28a745;"/>
+        </VBox>
+    </HBox>
+    <HBox spacing="20" VBox.vgrow="ALWAYS">
+        <VBox spacing="10" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;">
+            <Label text="Détails des Sondages" style="-fx-font-weight: bold; -fx-font-size: 16;"/>
+            <TableView fx:id="tableSondages" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colNomSondage" text="Sondage" prefWidth="150"/>
+                    <TableColumn fx:id="colPromo" text="Promotion" prefWidth="100"/>
+                    <TableColumn fx:id="colParticipation" text="Participation %" prefWidth="100"/>
+                    <TableColumn fx:id="colDateFin" text="Date de Fin %" prefWidth="100"/>
+                </columns>
+            </TableView>
+        </VBox>
+
+		<VBox spacing="10" HBox.hgrow="ALWAYS" prefWidth="350" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;">
+			<HBox spacing="10" alignment="CENTER_LEFT">
+	        <Label text="Filtrer :"/>
+	        <ComboBox fx:id="comboPromoFilter" prefWidth="150" promptText="Toutes les promos" />
+	        <Button text="Réinitialiser" onAction="#resetFiltre" style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+	    	</HBox>
+		    <Label text="Statistiques Étudiants" style="-fx-font-weight: bold; -fx-font-size: 16;"/>
+		    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: white;">
+		        <VBox spacing="20">
+		            <PieChart fx:id="chartRedoublants" title="Redoublants" prefHeight="250"/>
+		            <PieChart fx:id="chartAlternants" title="Alternance" prefHeight="250"/>
+		            <PieChart fx:id="chartParcours" title="Répartition Parcours" prefHeight="250"/>
+		        </VBox>
+	</ScrollPane>
+		</VBox>
+    </HBox>
+</VBox>

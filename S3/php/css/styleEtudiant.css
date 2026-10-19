@@ -1,0 +1,115 @@
+/* ==========================================================================
+   STYLES COMMUNS (Partagés par les deux pages)
+   ========================================================================== */
+
+.content-container {
+    padding: 40px 5%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.stat-card-white {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    width: 95%;
+    max-width: 1200px; /* On aligne sur la plus grande largeur */
+    border: 1px solid #eee;
+}
+
+.table-liste {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+}
+
+.table-liste th {
+    text-align: left;
+    padding: 20px;
+    color: #990033;
+    font-weight: bold;
+    border-bottom: 3px solid #990033;
+    text-transform: uppercase;
+    font-size: 0.85em;
+}
+
+.table-liste td {
+    padding: 18px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.table-liste tr:hover {
+    background-color: #fff9fa;
+}
+
+/* ==========================================================================
+   PAGE : MES GROUPES (#page-mes-groupes)
+   ========================================================================== */
+
+#page-mes-groupes .group-section-title {
+    color: #990033;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+}
+
+#page-mes-groupes .group-display-container {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    justify-content: center;
+    width: 100%;
+}
+
+#page-mes-groupes .group-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    border-left: 10px solid #990033;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    flex: 1;
+    max-width: 450px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+#page-mes-groupes .group-name {
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: #222;
+}
+
+/* ==========================================================================
+   PAGE : MA PROMOTION (#page-promotion)
+   ========================================================================== */
+
+#page-promotion .header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #edf2f7;
+    padding-bottom: 15px;
+}
+
+#page-promotion .badge-promo {
+    background-color: #990033;
+    color: white;
+    padding: 6px 18px;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+#page-promotion .table-liste code {
+    background-color: #f7fafc;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #990033;
+    border: 1px solid #edf2f7;
+}
